@@ -16,7 +16,8 @@ const sizes = {
 };
 
 function initials(nome: string): string {
-  return nome.split(' ').slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+  if (!nome) return '?';
+  return nome.split(' ').slice(0, 2).map((p) => p?.[0] ?? '').join('').toUpperCase() || '?';
 }
 
 export function Avatar({ nome, fotoUrl, size = 'md', className = '' }: AvatarProps) {

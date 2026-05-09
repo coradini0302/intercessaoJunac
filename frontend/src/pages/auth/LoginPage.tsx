@@ -33,10 +33,8 @@ export function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
-      console.log('[LOGIN] response:', JSON.stringify(data));
       flushSync(() => login(data));
       const dest = data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard';
-      console.log('[LOGIN] navigating to:', dest);
       navigate(dest, { replace: true });
     } catch (err) {
       toast.error(extractErrorMessage(err));

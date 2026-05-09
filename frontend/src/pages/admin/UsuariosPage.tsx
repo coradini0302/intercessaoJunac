@@ -103,7 +103,7 @@ export function UsuariosPage() {
   };
 
   const openEdit = (u: UsuarioAdmin) => {
-    reset({ nome: u.nome, apelido: u.apelido ?? '', email: u.email, role: u.role });
+    reset({ nome: u.nome, apelido: u.apelido ?? '', login: u.login, email: u.email, role: u.role });
     setEditUser(u);
   };
 
