@@ -51,6 +51,7 @@ export const mockEquipe: MembroEquipe[] = [
 
 export const mockUsuariosAdmin: UsuarioAdmin[] = mockEquipe.map((m, i) => ({
   ...m,
+  login: m.nome.split(' ')[0].toLowerCase(),
   email: `${m.nome.split(' ')[0].toLowerCase()}@junac.com`,
   ativo: true,
   trocouSenha: i !== 4,
