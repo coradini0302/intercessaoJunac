@@ -15,7 +15,7 @@ export function useAvisos(encontroId: number | undefined) {
 
 export function useAviso(id: number | undefined) {
   return useQuery<Aviso>({
-    queryKey: ['avisos', id],
+    queryKey: ['aviso', id],
     queryFn: async () => {
       const { data } = await api.get(`/api/avisos/${id}`);
       return data;
@@ -32,7 +32,7 @@ export function useComentarAviso() {
       return data;
     },
     onSuccess: (_, vars) => {
-      qc.invalidateQueries({ queryKey: ['avisos', vars.avisoId] });
+      qc.invalidateQueries({ queryKey: ['aviso', vars.avisoId] });
     },
   });
 }
@@ -44,7 +44,7 @@ export function useDeletarComentario() {
       await api.delete(`/api/avisos/${avisoId}/comentarios/${comentarioId}`);
     },
     onSuccess: (_, vars) => {
-      qc.invalidateQueries({ queryKey: ['avisos', vars.avisoId] });
+      qc.invalidateQueries({ queryKey: ['aviso', vars.avisoId] });
     },
   });
 }

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, User } from 'lucide-react';
 import { api, extractErrorMessage } from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
@@ -13,7 +13,7 @@ import type { LoginResponse } from '../../types';
 import { toast } from 'sonner';
 
 const schema = z.object({
-  email: z.string().email('E-mail inválido'),
+  login: z.string().min(1, 'Informe o login'),
   senha: z.string().min(1, 'Informe a senha'),
 });
 
@@ -32,7 +32,7 @@ export function LoginPage() {
   const onSubmit = async (values: FormData) => {
     setLoading(true);
     try {
-      const { data } = await api.post<LoginResponse>('/api/auth/login', values);
+      const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
       console.log('[LOGIN] response:', JSON.stringify(data));
       flushSync(() => login(data));
       const dest = data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard';
@@ -62,13 +62,13 @@ export function LoginPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <Input
-                label="E-mail"
-                type="email"
-                placeholder="seu@email.com"
-                autoComplete="email"
-                leftIcon={<Mail size={16} />}
-                error={errors.email?.message}
-                {...register('email')}
+                label="Login"
+                type="text"
+                placeholder="seu login"
+                autoComplete="username"
+                leftIcon={<User size={16} />}
+                error={errors.login?.message}
+                {...register('login')}
               />
 
               <div className="flex flex-col gap-1">

@@ -131,13 +131,13 @@ export function AvisoDetailPage() {
             <div className="flex items-center gap-2 mb-3 px-0.5">
               <MessageCircle size={16} className="text-slate-400" />
               <p className="text-sm font-semibold text-slate-700">
-                {aviso.comentarios.length > 0
+                {(aviso.comentarios?.length ?? 0) > 0
                   ? `${aviso.comentarios.length} comentário${aviso.comentarios.length !== 1 ? 's' : ''}`
                   : 'Comentários'}
               </p>
             </div>
 
-            {aviso.comentarios.map((c) => (
+            {aviso.comentarios?.map((c) => (
               <div key={c.id} className="flex items-start gap-2.5 mb-3">
                 <Avatar
                   nome={c.nomeUsuario}

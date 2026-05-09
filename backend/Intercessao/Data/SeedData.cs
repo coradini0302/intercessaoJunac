@@ -29,13 +29,13 @@ public static class SeedData
 
     private static async Task CriarAdminInicialAsync(UserManager<ApplicationUser> userManager)
     {
-        const string email = "dev@intercejunac.com";
-        if (await userManager.FindByEmailAsync(email) is not null) return;
+        const string loginAdmin = "devadmin";
+        if (await userManager.FindByNameAsync(loginAdmin) is not null) return;
 
         var user = new ApplicationUser
         {
-            UserName = email,
-            Email = email,
+            UserName = loginAdmin,
+            Email = "dev@intercejunac.com",
             Nome = "Dev Admin",
             Ativo = true,
             TrocouSenha = false,

@@ -85,12 +85,12 @@ export function VotacaoDetailPage() {
         </Card>
 
         <div className="flex flex-col gap-2">
-          {votacao.opcoes
+          {(votacao.opcoes ?? [])
             .sort((a, b) => a.ordem - b.ordem)
             .map((opcao) => {
               const isMinha = votacao.minhaOpcaoId === opcao.id;
               const isSelected = selectedOpcao === opcao.id;
-              const isWinner = !votacao.ativa && opcao.totalVotos === Math.max(...votacao.opcoes.map((o) => o.totalVotos));
+              const isWinner = !votacao.ativa && opcao.totalVotos === Math.max(...(votacao.opcoes ?? []).map((o) => o.totalVotos));
 
               return (
                 <button

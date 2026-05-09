@@ -42,6 +42,7 @@ export interface UsuarioAdmin {
   id: string;
   nome: string;
   apelido: string | null;
+  login: string;
   email: string;
   role: Role;
   ativo: boolean;

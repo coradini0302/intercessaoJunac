@@ -82,13 +82,16 @@ public class UsuariosController(
         if (!RoleValida(request.Role))
             return BadRequest(new { erro = $"Role inválida. Use: {Roles.DevAdmin}, {Roles.Admin} ou {Roles.Intercessor}." });
 
+        if (await userManager.FindByNameAsync(request.Login) is not null)
+            return Conflict(new { erro = "Login já em uso." });
+
         if (await userManager.FindByEmailAsync(request.Email) is not null)
             return Conflict(new { erro = "E-mail já cadastrado." });
 
         var senhaTemp = GerarSenhaTemporaria();
         var user = new ApplicationUser
         {
-            UserName = request.Email,
+            UserName = request.Login,
             Email = request.Email,
             Nome = request.Nome,
             Apelido = request.Apelido,
@@ -127,12 +130,18 @@ public class UsuariosController(
         user.Apelido = request.Apelido;
         user.AtualizadoEm = DateTime.UtcNow;
 
+        if (!string.IsNullOrWhiteSpace(request.Login) && request.Login != user.UserName)
+        {
+            if (await userManager.FindByNameAsync(request.Login) is not null)
+                return Conflict(new { erro = "Login já em uso." });
+            user.UserName = request.Login;
+        }
+
         if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
         {
             if (await userManager.FindByEmailAsync(request.Email) is not null)
                 return Conflict(new { erro = "E-mail já em uso." });
             user.Email = request.Email;
-            user.UserName = request.Email;
         }
 
         await userManager.UpdateAsync(user);
@@ -221,6 +230,7 @@ public class UsuariosController(
         Id = user.Id,
         Nome = user.Nome,
         Apelido = user.Apelido,
+        Login = user.UserName ?? string.Empty,
         Email = user.Email!,
         Role = role,
         Ativo = user.Ativo,

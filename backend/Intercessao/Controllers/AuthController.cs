@@ -33,11 +33,11 @@ public class AuthController(
     {
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-        var user = await userManager.FindByEmailAsync(request.Email);
+        var user = await userManager.FindByNameAsync(request.Login);
         if (user is null || !user.Ativo)
         {
             await auditoria.RegistrarAsync(AcaoAuditoria.TentativaLoginFalha,
-                descricao: $"Email: {request.Email}", ipAddress: ip);
+                descricao: $"Login: {request.Login}", ipAddress: ip);
             return Unauthorized(new { erro = "Credenciais inválidas." });
         }
 

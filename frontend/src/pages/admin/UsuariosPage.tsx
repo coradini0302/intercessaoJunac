@@ -21,6 +21,7 @@ import type { Role, UsuarioAdmin } from '../../types';
 interface UserForm {
   nome: string;
   apelido: string;
+  login: string;
   email: string;
   role: Role;
 }
@@ -48,6 +49,7 @@ export function UsuariosPage() {
       const res = await criar.mutateAsync({
         nome: values.nome,
         apelido: values.apelido || null,
+        login: values.login,
         email: values.email,
         role: values.role,
       });
@@ -130,7 +132,7 @@ export function UsuariosPage() {
                   {!u.ativo && <Badge label="Inativo" variant="red" />}
                   {!u.trocouSenha && <Badge label="Senha temp." variant="yellow" />}
                 </div>
-                <p className="text-xs text-slate-400">{u.email}</p>
+                <p className="text-xs text-slate-400">@{u.login} · {u.email}</p>
                 <p className="text-xs text-primary-600">{roleLabel(u.role)}</p>
               </div>
               <div className="flex flex-col gap-1">
@@ -168,6 +170,7 @@ export function UsuariosPage() {
         <form className="flex flex-col gap-4">
           <Input label="Nome *" placeholder="Nome completo" error={errors.nome?.message} {...register('nome', { required: 'Obrigatório' })} />
           <Input label="Apelido" placeholder="Nome preferido (opcional)" {...register('apelido')} />
+          <Input label="Login *" placeholder="login de acesso" error={errors.login?.message} {...register('login', { required: 'Obrigatório' })} />
           <Input label="E-mail *" type="email" placeholder="email@exemplo.com" error={errors.email?.message} {...register('email', { required: 'Obrigatório' })} />
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-slate-700">Perfil</label>

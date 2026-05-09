@@ -46,8 +46,10 @@ public class AgendaSemanalController(AppDbContext db) : ControllerBase
 
         if (encontroId.HasValue) query = query.Where(a => a.EncontroId == encontroId.Value);
 
-        var items = await query.ToListAsync();
-        return Ok(items.Select(a => Mapear(a, semanaAtual)));
+        var item = await query.FirstOrDefaultAsync();
+        if (item is null) return NotFound(new { erro = "Nenhuma agenda para a semana atual." });
+
+        return Ok(Mapear(item, semanaAtual));
     }
 
     [HttpGet("{id:int}")]

@@ -4,7 +4,7 @@ namespace Intercessao.DTOs;
 
 public class LoginRequest
 {
-    [Required] public string Email { get; set; } = string.Empty;
+    [Required] public string Login { get; set; } = string.Empty;
     [Required] public string Senha { get; set; } = string.Empty;
 }
 
