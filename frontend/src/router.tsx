@@ -21,6 +21,7 @@ import { InfoRestritasPage } from './pages/admin/InfoRestritasPage';
 
 function RequireAuth() {
   const { isAuthenticated, user } = useAuth();
+  console.log('[RequireAuth] isAuthenticated:', isAuthenticated, 'trocaSenha:', user?.trocaSenhaObrigatoria);
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.trocaSenhaObrigatoria) return <Navigate to="/trocar-senha" replace />;
   return <Outlet />;
