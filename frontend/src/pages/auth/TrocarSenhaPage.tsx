@@ -62,7 +62,8 @@ export function TrocarSenhaPage() {
     if (isAuthenticated && user?.trocaSenhaObrigatoria === false) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, user?.trocaSenhaObrigatoria, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -74,6 +75,7 @@ export function TrocarSenhaPage() {
       const { data } = await api.post<LoginResponse>('/api/auth/trocar-senha', values);
       updateToken(data);
       toast.success('Senha alterada com sucesso!');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {

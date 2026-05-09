@@ -28,7 +28,8 @@ export function LoginPage() {
     if (isAuthenticated) {
       navigate(user?.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
     }
-  }, [isAuthenticated, user?.trocaSenhaObrigatoria, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -39,6 +40,7 @@ export function LoginPage() {
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
       login(data);
+      navigate(data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
