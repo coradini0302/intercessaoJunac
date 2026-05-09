@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -32,12 +33,8 @@ export function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', values);
-      login(data);
-      if (data.trocaSenhaObrigatoria) {
-        navigate('/trocar-senha', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
+      flushSync(() => login(data));
+      navigate(data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
