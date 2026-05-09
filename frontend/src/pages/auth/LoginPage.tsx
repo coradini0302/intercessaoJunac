@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,13 +19,12 @@ type FormData = z.infer<typeof schema>;
 
 export function LoginPage() {
   const { login, isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(user?.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
+      window.location.replace(user?.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -40,7 +38,7 @@ export function LoginPage() {
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
       login(data);
-      navigate(data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
+      window.location.replace(data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard');
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
