@@ -143,7 +143,9 @@ public class AuthController(
         user.Apelido = request.Apelido;
         user.AtualizadoEm = DateTime.UtcNow;
 
-        await userManager.UpdateAsync(user);
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+            return BadRequest(new { erro = string.Join(", ", updateResult.Errors.Select(e => e.Description)) });
 
         // Reissue token com nome atualizado
         var roles = await userManager.GetRolesAsync(user);

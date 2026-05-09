@@ -37,21 +37,27 @@ public static class SeedData
             var novoUser = new ApplicationUser
             {
                 UserName = loginAdmin,
-                Email = "dev@intercejunac.com",
-                Nome = "Dev Admin",
+                Email = "gabriel@intercejunac.com",
+                Nome = "Gabriel Coradini",
+                Apelido = "Ronaldo",
                 Ativo = true,
                 TrocouSenha = false,
                 EmailConfirmed = true
             };
 
             var result = await userManager.CreateAsync(novoUser, "Junac@2025");
-            if (!result.Succeeded) return;
+            if (!result.Succeeded)
+            {
+                Console.Error.WriteLine($"[SeedData] CreateAsync failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                return;
+            }
             admin = novoUser;
         }
 
-        // Garante que nome e ativo estão corretos mesmo para usuário já existente
+        // Garante que nome, apelido e ativo estão corretos mesmo para usuário já existente
         bool precisaAtualizar = false;
-        if (string.IsNullOrWhiteSpace(admin.Nome)) { admin.Nome = "Dev Admin"; precisaAtualizar = true; }
+        if (admin.Nome != "Gabriel Coradini") { admin.Nome = "Gabriel Coradini"; precisaAtualizar = true; }
+        if (admin.Apelido != "Ronaldo") { admin.Apelido = "Ronaldo"; precisaAtualizar = true; }
         if (!admin.Ativo) { admin.Ativo = true; precisaAtualizar = true; }
         if (precisaAtualizar)
         {
@@ -60,10 +66,13 @@ public static class SeedData
                 Console.Error.WriteLine($"[SeedData] UpdateAsync failed: {string.Join(", ", r.Errors.Select(e => e.Description))}");
         }
 
-        // Garante que o role está atribuído
-        if (!await userManager.IsInRoleAsync(admin, Roles.DevAdmin))
+        // Garante que tem exatamente a role Admin
+        if (await userManager.IsInRoleAsync(admin, Roles.DevAdmin))
+            await userManager.RemoveFromRoleAsync(admin, Roles.DevAdmin);
+
+        if (!await userManager.IsInRoleAsync(admin, Roles.Admin))
         {
-            var r = await userManager.AddToRoleAsync(admin, Roles.DevAdmin);
+            var r = await userManager.AddToRoleAsync(admin, Roles.Admin);
             if (!r.Succeeded)
                 Console.Error.WriteLine($"[SeedData] AddToRoleAsync failed: {string.Join(", ", r.Errors.Select(e => e.Description))}");
         }

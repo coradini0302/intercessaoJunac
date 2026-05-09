@@ -88,9 +88,12 @@ using (var scope = app.Services.CreateScope())
 
     await db.Database.EnsureCreatedAsync();
 
+    // Patch de schema: adiciona colunas que podem faltar em DBs antigos
+    await ApplySchemaPatches(db);
+
     await SeedData.InicializarAsync(db, userManager, roleManager);
 
-    // Safety-net: garante que devadmin tem nome e role mesmo se o ORM falhou
+    // Safety-net via SQL direto, caso o ORM tenha falhado silenciosamente
     await FixDevAdminAsync(db);
 }
 
@@ -112,21 +115,43 @@ app.MapControllers();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Run($"http://0.0.0.0:{port}");
 
+static async Task ApplySchemaPatches(AppDbContext db)
+{
+    // Adiciona colunas que foram incluídas em migrações posteriores ao EnsureCreated
+    // SQLite não suporta IF NOT EXISTS no ADD COLUMN; usamos try/catch por coluna
+    var patches = new[]
+    {
+        "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
+    };
+    foreach (var sql in patches)
+    {
+        try { await db.Database.ExecuteSqlRawAsync(sql); }
+        catch { /* coluna já existe, ignorar */ }
+    }
+}
+
 static async Task FixDevAdminAsync(AppDbContext db)
 {
     try
     {
+        // Garante nome e apelido corretos (sempre, não só quando vazio)
         var nomeRows = await db.Database.ExecuteSqlRawAsync(
-            "UPDATE AspNetUsers SET Nome = 'Dev Admin' WHERE NormalizedUserName = 'DEVADMIN' AND (Nome IS NULL OR Nome = '')");
-        Console.Error.WriteLine($"[FixDevAdmin] Nome rows updated: {nomeRows}");
+            "UPDATE AspNetUsers SET Nome = 'Gabriel Coradini', Apelido = 'Ronaldo' WHERE NormalizedUserName = 'DEVADMIN'");
+        Console.Error.WriteLine($"[FixDevAdmin] Nome/apelido rows updated: {nomeRows}");
+
+        // Remove role DevAdmin se existir e garante role Admin
+        await db.Database.ExecuteSqlRawAsync(@"
+            DELETE FROM AspNetUserRoles
+            WHERE UserId = (SELECT Id FROM AspNetUsers WHERE NormalizedUserName = 'DEVADMIN')
+              AND RoleId = (SELECT Id FROM AspNetRoles WHERE NormalizedName = 'DEVADMIN')");
 
         var roleRows = await db.Database.ExecuteSqlRawAsync(@"
             INSERT OR IGNORE INTO AspNetUserRoles (UserId, RoleId)
             SELECT u.Id, r.Id
             FROM AspNetUsers u
-            JOIN AspNetRoles r ON r.NormalizedName = 'DEVADMIN'
+            JOIN AspNetRoles r ON r.NormalizedName = 'ADMIN'
             WHERE u.NormalizedUserName = 'DEVADMIN'");
-        Console.Error.WriteLine($"[FixDevAdmin] Role rows inserted: {roleRows}");
+        Console.Error.WriteLine($"[FixDevAdmin] Admin role rows inserted: {roleRows}");
     }
     catch (Exception ex)
     {
