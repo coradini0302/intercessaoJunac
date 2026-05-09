@@ -32,7 +32,7 @@ export function BottomNav() {
     return () => document.removeEventListener('mousedown', handler);
   }, [moreOpen]);
 
-  const effectiveRole = perfil?.role ?? user?.role;
+  const effectiveRole = perfil?.role || user?.role;
   const admin = !!effectiveRole && isAdmin(effectiveRole);
 
   const moreLinks = [

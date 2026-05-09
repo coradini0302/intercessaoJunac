@@ -53,11 +53,20 @@ public static class SeedData
         bool precisaAtualizar = false;
         if (string.IsNullOrWhiteSpace(admin.Nome)) { admin.Nome = "Dev Admin"; precisaAtualizar = true; }
         if (!admin.Ativo) { admin.Ativo = true; precisaAtualizar = true; }
-        if (precisaAtualizar) await userManager.UpdateAsync(admin);
+        if (precisaAtualizar)
+        {
+            var r = await userManager.UpdateAsync(admin);
+            if (!r.Succeeded)
+                Console.Error.WriteLine($"[SeedData] UpdateAsync failed: {string.Join(", ", r.Errors.Select(e => e.Description))}");
+        }
 
         // Garante que o role está atribuído
         if (!await userManager.IsInRoleAsync(admin, Roles.DevAdmin))
-            await userManager.AddToRoleAsync(admin, Roles.DevAdmin);
+        {
+            var r = await userManager.AddToRoleAsync(admin, Roles.DevAdmin);
+            if (!r.Succeeded)
+                Console.Error.WriteLine($"[SeedData] AddToRoleAsync failed: {string.Join(", ", r.Errors.Select(e => e.Description))}");
+        }
     }
 
     private static async Task CriarEncontroInicialAsync(AppDbContext db)

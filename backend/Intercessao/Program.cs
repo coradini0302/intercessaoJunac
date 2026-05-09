@@ -116,17 +116,20 @@ static async Task FixDevAdminAsync(AppDbContext db)
 {
     try
     {
-        // Garante que o nome está preenchido
-        await db.Database.ExecuteSqlRawAsync(
-            "UPDATE AspNetUsers SET Nome = 'Dev Admin' WHERE UserName = 'devadmin' AND (Nome IS NULL OR Nome = '')");
+        var nomeRows = await db.Database.ExecuteSqlRawAsync(
+            "UPDATE AspNetUsers SET Nome = 'Dev Admin' WHERE NormalizedUserName = 'DEVADMIN' AND (Nome IS NULL OR Nome = '')");
+        Console.Error.WriteLine($"[FixDevAdmin] Nome rows updated: {nomeRows}");
 
-        // Garante que a role DevAdmin está atribuída (INSERT OR IGNORE = no-op se já existe)
-        await db.Database.ExecuteSqlRawAsync(@"
+        var roleRows = await db.Database.ExecuteSqlRawAsync(@"
             INSERT OR IGNORE INTO AspNetUserRoles (UserId, RoleId)
             SELECT u.Id, r.Id
             FROM AspNetUsers u
-            JOIN AspNetRoles r ON UPPER(r.Name) = 'DEVADMIN'
-            WHERE u.UserName = 'devadmin'");
+            JOIN AspNetRoles r ON r.NormalizedName = 'DEVADMIN'
+            WHERE u.NormalizedUserName = 'DEVADMIN'");
+        Console.Error.WriteLine($"[FixDevAdmin] Role rows inserted: {roleRows}");
     }
-    catch { /* best-effort */ }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"[FixDevAdmin] ERROR: {ex.GetType().Name}: {ex.Message}");
+    }
 }

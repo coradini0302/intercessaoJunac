@@ -28,7 +28,7 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   const { data: perfil } = usePerfil();
   const navigate = useNavigate();
-  const effectiveRole = perfil?.role ?? user?.role;
+  const effectiveRole = perfil?.role || user?.role;
   const admin = !!effectiveRole && isAdmin(effectiveRole);
 
   const handleLogout = () => {
@@ -112,7 +112,7 @@ export function Sidebar() {
             <Avatar nome={user?.nome ?? ''} fotoUrl={perfil?.fotoUrl} size="sm" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-slate-800 leading-tight truncate">
-                {displayName(perfil?.nome ?? user?.nome ?? '', perfil?.apelido ?? null)}
+                {displayName(perfil?.nome || user?.nome || '', perfil?.apelido ?? null)}
               </p>
               <p className="text-xs text-slate-400 truncate">
                 {effectiveRole ? roleLabel(effectiveRole) : ''}
