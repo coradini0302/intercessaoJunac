@@ -30,21 +30,34 @@ public static class SeedData
     private static async Task CriarAdminInicialAsync(UserManager<ApplicationUser> userManager)
     {
         const string loginAdmin = "devadmin";
-        if (await userManager.FindByNameAsync(loginAdmin) is not null) return;
+        var admin = await userManager.FindByNameAsync(loginAdmin);
 
-        var user = new ApplicationUser
+        if (admin is null)
         {
-            UserName = loginAdmin,
-            Email = "dev@intercejunac.com",
-            Nome = "Dev Admin",
-            Ativo = true,
-            TrocouSenha = false,
-            EmailConfirmed = true
-        };
+            var novoUser = new ApplicationUser
+            {
+                UserName = loginAdmin,
+                Email = "dev@intercejunac.com",
+                Nome = "Dev Admin",
+                Ativo = true,
+                TrocouSenha = false,
+                EmailConfirmed = true
+            };
 
-        var result = await userManager.CreateAsync(user, "Junac@2025");
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(user, Roles.DevAdmin);
+            var result = await userManager.CreateAsync(novoUser, "Junac@2025");
+            if (!result.Succeeded) return;
+            admin = novoUser;
+        }
+
+        // Garante que nome e ativo estão corretos mesmo para usuário já existente
+        bool precisaAtualizar = false;
+        if (string.IsNullOrWhiteSpace(admin.Nome)) { admin.Nome = "Dev Admin"; precisaAtualizar = true; }
+        if (!admin.Ativo) { admin.Ativo = true; precisaAtualizar = true; }
+        if (precisaAtualizar) await userManager.UpdateAsync(admin);
+
+        // Garante que o role está atribuído
+        if (!await userManager.IsInRoleAsync(admin, Roles.DevAdmin))
+            await userManager.AddToRoleAsync(admin, Roles.DevAdmin);
     }
 
     private static async Task CriarEncontroInicialAsync(AppDbContext db)

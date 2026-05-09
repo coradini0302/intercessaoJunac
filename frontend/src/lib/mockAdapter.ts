@@ -34,6 +34,8 @@ function getMockData(method: string, url: string): unknown {
     if (u === '/api/compromissos-oracao/semanas') return mockSemanas;
     if (u === '/api/compromissos-oracao/meus') return mockMeusCompromissos;
     if (u === '/api/compromissos-oracao') return mockMeusCompromissos;
+    if (u === '/api/compromissos-intercedidos/meus') return [];
+    if (u === '/api/compromissos-equipe') return [];
 
     if (u === '/api/agenda-semanal/atual') return mockAgendaAtual;
     if (u === '/api/agenda-semanal') return mockAgendas;

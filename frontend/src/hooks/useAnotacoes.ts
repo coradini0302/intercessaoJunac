@@ -7,7 +7,7 @@ export function useAnotacoes() {
     queryKey: ['anotacoes'],
     queryFn: async () => {
       const { data } = await api.get('/api/anotacoes');
-      return data;
+      return Array.isArray(data) ? data : [];
     },
   });
 }

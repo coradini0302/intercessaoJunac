@@ -17,7 +17,7 @@ export function useEquipe() {
     queryKey: ['equipe'],
     queryFn: async () => {
       const { data } = await api.get('/api/usuarios/equipe');
-      return data;
+      return Array.isArray(data) ? data : [];
     },
   });
 }
@@ -27,7 +27,7 @@ export function useUsuariosAdmin() {
     queryKey: ['usuarios'],
     queryFn: async () => {
       const { data } = await api.get('/api/usuarios');
-      return data;
+      return Array.isArray(data) ? data : [];
     },
   });
 }

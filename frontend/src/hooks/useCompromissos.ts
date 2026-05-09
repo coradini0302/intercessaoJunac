@@ -31,7 +31,7 @@ export function useMeusIntercedidos(ativo = true) {
     queryKey: ['meus-intercedidos', ativo],
     queryFn: async () => {
       const { data } = await api.get(`/api/compromissos-intercedidos/meus?ativo=${ativo}`);
-      return data;
+      return Array.isArray(data) ? data : [];
     },
   });
 }
@@ -92,7 +92,7 @@ export function useCompromissosEquipe(encontroId: number | undefined) {
     queryKey: ['compromissos-equipe', encontroId],
     queryFn: async () => {
       const { data } = await api.get(`/api/compromissos-equipe?encontroId=${encontroId}`);
-      return data;
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!encontroId,
   });
