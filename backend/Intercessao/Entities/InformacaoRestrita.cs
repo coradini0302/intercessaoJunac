@@ -1,0 +1,14 @@
+namespace Intercessao.Entities;
+
+public class InformacaoRestrita
+{
+    public int Id { get; set; }
+    public int EncontroId { get; set; }
+    public Encontro Encontro { get; set; } = null!;
+    public string Titulo { get; set; } = string.Empty;
+    public string Conteudo { get; set; } = string.Empty;
+    public string CriadoPorId { get; set; } = string.Empty;
+    public ApplicationUser CriadoPor { get; set; } = null!;
+    public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+    public DateTime? AtualizadoEm { get; set; }
+}

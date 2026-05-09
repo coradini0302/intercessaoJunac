@@ -1,0 +1,23 @@
+## Build
+bin/
+obj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
+## Uploads (não versionar fotos de usuários)
+**/wwwroot/uploads/
+
+## Secrets locais (nunca commitar)
+**/appsettings.Local.json
+
+## OS
+.DS_Store
+Thumbs.db

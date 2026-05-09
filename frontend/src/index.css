@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f0f9ff;
+    color: #334155;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply max-w-lg mx-auto w-full flex-1 flex flex-col;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
