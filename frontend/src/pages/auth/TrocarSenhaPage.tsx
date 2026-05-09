@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -66,7 +67,7 @@ export function TrocarSenhaPage() {
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/trocar-senha', values);
-      updateToken(data);
+      flushSync(() => updateToken(data));
       toast.success('Senha alterada com sucesso!');
       navigate('/dashboard', { replace: true });
     } catch (err) {
