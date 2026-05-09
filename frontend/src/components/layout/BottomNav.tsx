@@ -6,6 +6,7 @@ import {
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { isAdmin } from '../../lib/utils';
+import { usePerfil } from '../../hooks/useUsuarios';
 
 const mainLinks = [
   { to: '/dashboard', icon: Home, label: 'Início' },
@@ -16,6 +17,7 @@ const mainLinks = [
 
 export function BottomNav() {
   const { user } = useAuth();
+  const { data: perfil } = usePerfil();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -30,7 +32,8 @@ export function BottomNav() {
     return () => document.removeEventListener('mousedown', handler);
   }, [moreOpen]);
 
-  const admin = user && isAdmin(user.role);
+  const effectiveRole = perfil?.role ?? user?.role;
+  const admin = !!effectiveRole && isAdmin(effectiveRole);
 
   const moreLinks = [
     { to: '/agenda', icon: CalendarDays, label: 'Agenda' },

@@ -32,7 +32,7 @@ export function DashboardPage() {
   const proximaEscala = minhasEscalas?.[0];
   const avisosAtivos = avisos?.filter((a) => a.ativo) ?? [];
   const votacoesAtivas = votacoes?.filter((v) => v.ativa) ?? [];
-  const nome = displayName(user?.nome ?? '', perfil?.apelido ?? null);
+  const nome = displayName(perfil?.nome ?? user?.nome ?? '', perfil?.apelido ?? null);
 
   const hora = new Date().getHours();
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
