@@ -89,6 +89,9 @@ using (var scope = app.Services.CreateScope())
     await db.Database.EnsureCreatedAsync();
 
     await SeedData.InicializarAsync(db, userManager, roleManager);
+
+    // Safety-net: garante que devadmin tem nome e role mesmo se o ORM falhou
+    await FixDevAdminAsync(db);
 }
 
 if (app.Environment.IsDevelopment())
@@ -108,3 +111,22 @@ app.MapControllers();
 // Porta dinâmica para Railway
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Run($"http://0.0.0.0:{port}");
+
+static async Task FixDevAdminAsync(AppDbContext db)
+{
+    try
+    {
+        // Garante que o nome está preenchido
+        await db.Database.ExecuteSqlRawAsync(
+            "UPDATE AspNetUsers SET Nome = 'Dev Admin' WHERE UserName = 'devadmin' AND (Nome IS NULL OR Nome = '')");
+
+        // Garante que a role DevAdmin está atribuída (INSERT OR IGNORE = no-op se já existe)
+        await db.Database.ExecuteSqlRawAsync(@"
+            INSERT OR IGNORE INTO AspNetUserRoles (UserId, RoleId)
+            SELECT u.Id, r.Id
+            FROM AspNetUsers u
+            JOIN AspNetRoles r ON UPPER(r.Name) = 'DEVADMIN'
+            WHERE u.UserName = 'devadmin'");
+    }
+    catch { /* best-effort */ }
+}
