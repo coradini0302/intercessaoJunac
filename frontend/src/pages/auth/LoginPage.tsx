@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { flushSync } from 'react-dom';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -20,10 +19,16 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(user?.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, user?.trocaSenhaObrigatoria, navigate]);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -33,9 +38,7 @@ export function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
-      flushSync(() => login(data));
-      const dest = data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard';
-      navigate(dest, { replace: true });
+      login(data);
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {

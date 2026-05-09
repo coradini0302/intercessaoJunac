@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { flushSync } from 'react-dom';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -55,9 +54,15 @@ function PasswordField({
 }
 
 export function TrocarSenhaPage() {
-  const { updateToken, user } = useAuth();
+  const { updateToken, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.trocaSenhaObrigatoria === false) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, user?.trocaSenhaObrigatoria, navigate]);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -67,9 +72,8 @@ export function TrocarSenhaPage() {
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/trocar-senha', values);
-      flushSync(() => updateToken(data));
+      updateToken(data);
       toast.success('Senha alterada com sucesso!');
-      navigate('/dashboard', { replace: true });
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
