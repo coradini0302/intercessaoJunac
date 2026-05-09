@@ -12,7 +12,7 @@ public class TokenService(IConfiguration config) : ITokenService
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiracao = DateTime.UtcNow.AddHours(config.GetValue<int>("Jwt:ExpirationHours", 12));
+        var expiracao = DateTime.UtcNow.AddMinutes(config.GetValue<int>("Jwt:ExpirationMinutes", 30));
 
         var claims = new List<Claim>
         {
