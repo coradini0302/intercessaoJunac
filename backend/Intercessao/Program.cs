@@ -11,9 +11,14 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// EF Core + SQLite
+// EF Core + SQLite — usa DB_PATH env var em produção (Railway Volume) ou connection string local
+var dbPath = Environment.GetEnvironmentVariable("DB_PATH");
+var connectionString = dbPath is not null
+    ? $"Data Source={dbPath}"
+    : builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=intercejunac.db";
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opt.UseSqlite(connectionString));
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
