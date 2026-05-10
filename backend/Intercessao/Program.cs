@@ -11,17 +11,25 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// EF Core + SQLite — usa DB_PATH env var em produção (Railway Volume) ou connection string local
-var dbPath = Environment.GetEnvironmentVariable("DB_PATH");
-if (dbPath is not null)
-    Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+// EF Core — PostgreSQL em produção (DATABASE_URL), SQLite em dev
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-var connectionString = dbPath is not null
-    ? $"Data Source={dbPath}"
-    : builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=intercejunac.db";
-
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlite(connectionString));
+if (databaseUrl is not null)
+{
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseNpgsql(ParseDatabaseUrl(databaseUrl)));
+}
+else
+{
+    var dbPath = Environment.GetEnvironmentVariable("DB_PATH");
+    if (dbPath is not null)
+        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+    var connectionString = dbPath is not null
+        ? $"Data Source={dbPath}"
+        : builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=intercejunac.db";
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseSqlite(connectionString));
+}
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
@@ -100,9 +108,6 @@ using (var scope = app.Services.CreateScope())
     await ApplySchemaPatches(db);
 
     await SeedData.InicializarAsync(db, userManager, roleManager);
-
-    // Safety-net via SQL direto, caso o ORM tenha falhado silenciosamente
-    await FixDevAdminAsync(db);
 }
 
 if (app.Environment.IsDevelopment())
@@ -125,45 +130,33 @@ app.Run($"http://0.0.0.0:{port}");
 
 static async Task ApplySchemaPatches(AppDbContext db)
 {
-    // Adiciona colunas que foram incluídas em migrações posteriores ao EnsureCreated
-    // SQLite não suporta IF NOT EXISTS no ADD COLUMN; usamos try/catch por coluna
-    var patches = new[]
-    {
-        "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
-        "ALTER TABLE AvisoComentarios ADD COLUMN UrlMidia TEXT",
-    };
+    bool isPostgres = db.Database.ProviderName?.Contains("Npgsql") == true;
+
+    // PostgreSQL suporta IF NOT EXISTS; SQLite não — usamos try/catch
+    string[] patches = isPostgres
+        ? [
+            """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "EquipeIntercessao" TEXT""",
+            """ALTER TABLE "AvisoComentarios" ADD COLUMN IF NOT EXISTS "UrlMidia" TEXT""",
+          ]
+        : [
+            "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
+            "ALTER TABLE AvisoComentarios ADD COLUMN UrlMidia TEXT",
+          ];
+
     foreach (var sql in patches)
     {
         try { await db.Database.ExecuteSqlRawAsync(sql); }
-        catch { /* coluna já existe, ignorar */ }
+        catch { /* coluna já existe */ }
     }
 }
 
-static async Task FixDevAdminAsync(AppDbContext db)
+static string ParseDatabaseUrl(string url)
 {
-    try
-    {
-        // Garante nome e apelido corretos (sempre, não só quando vazio)
-        var nomeRows = await db.Database.ExecuteSqlRawAsync(
-            "UPDATE AspNetUsers SET Nome = 'Gabriel Coradini', Apelido = 'Ronaldo' WHERE NormalizedUserName = 'DEVADMIN'");
-        Console.Error.WriteLine($"[FixDevAdmin] Nome/apelido rows updated: {nomeRows}");
-
-        // Remove role DevAdmin se existir e garante role Admin
-        await db.Database.ExecuteSqlRawAsync(@"
-            DELETE FROM AspNetUserRoles
-            WHERE UserId = (SELECT Id FROM AspNetUsers WHERE NormalizedUserName = 'DEVADMIN')
-              AND RoleId = (SELECT Id FROM AspNetRoles WHERE NormalizedName = 'DEVADMIN')");
-
-        var roleRows = await db.Database.ExecuteSqlRawAsync(@"
-            INSERT OR IGNORE INTO AspNetUserRoles (UserId, RoleId)
-            SELECT u.Id, r.Id
-            FROM AspNetUsers u
-            JOIN AspNetRoles r ON r.NormalizedName = 'ADMIN'
-            WHERE u.NormalizedUserName = 'DEVADMIN'");
-        Console.Error.WriteLine($"[FixDevAdmin] Admin role rows inserted: {roleRows}");
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"[FixDevAdmin] ERROR: {ex.GetType().Name}: {ex.Message}");
-    }
+    var uri = new Uri(url);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    var user = Uri.UnescapeDataString(userInfo[0]);
+    var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+    var db = uri.AbsolutePath.TrimStart('/');
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    return $"Host={uri.Host};Port={port};Database={db};Username={user};Password={password};SSL Mode=Require;Trust Server Certificate=true";
 }
