@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../context/AuthContext';
 import { useEncontroAtivo } from '../hooks/useEncontro';
 import {
-  useMeusIntercedidos, useAdicionarIntercedido, useEditarIntercedido,
+  useIntercedidos, useAdicionarIntercedido, useEditarIntercedido,
   useArquivarIntercedido, useDeletarIntercedido,
   useCompromissosEquipe, useAdicionarCompromissoEquipe,
   useEditarCompromissoEquipe, useDeletarCompromissoEquipe,
@@ -301,7 +301,7 @@ export function OracaoPage() {
   const [form, setForm] = useState<EventoForm>(FORM_VAZIO);
   const [loading, setLoading] = useState(false);
 
-  const { data: meusIntercedidos, isLoading: loadingMeus } = useMeusIntercedidos(undefined);
+  const { data: meusIntercedidos, isLoading: loadingMeus } = useIntercedidos(undefined);
   const { data: compromissosEquipe, isLoading: loadingEquipe } = useCompromissosEquipe(encontro?.id);
 
   const adicionarIntercedido = useAdicionarIntercedido();
@@ -473,18 +473,17 @@ export function OracaoPage() {
               <SemanaSection
                 key={sem} semana={sem} semanaAtual={semanaAtual}
                 open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, false)} canAdd={true}
+                onAdd={() => openModalAdd(sem, false)} canAdd={!!admin}
               >
                 {items.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <BookOpen size={18} className="text-slate-300" />
                     <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
-                    <button
-                      onClick={() => openModalAdd(sem, false)}
-                      className="text-xs text-primary-600 hover:underline"
-                    >
-                      + Adicionar
-                    </button>
+                    {admin && (
+                      <button onClick={() => openModalAdd(sem, false)} className="text-xs text-primary-600 hover:underline">
+                        + Adicionar
+                      </button>
+                    )}
                   </div>
                 )}
                 {items.map((c) => (
@@ -496,9 +495,9 @@ export function OracaoPage() {
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
                     arquivado={!c.ativo}
-                    showActions={true}
-                    onEdit={() => openModalEdit(c, false)}
-                    onArchivar={() => handleArquivar(c.id, c.ativo)}
+                    showActions={!!admin}
+                    onEdit={admin ? () => openModalEdit(c, false) : undefined}
+                    onArchivar={admin ? () => handleArquivar(c.id, c.ativo) : undefined}
                     onDelete={() => handleDeletarMeus(c.id)}
                   />
                 ))}
@@ -520,17 +519,15 @@ export function OracaoPage() {
               <SemanaSection
                 key={sem} semana={sem} semanaAtual={semanaAtual}
                 open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, true)} canAdd={!!admin}
+                onAdd={() => openModalAdd(sem, true)} canAdd={true}
               >
                 {items.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <BookOpen size={18} className="text-slate-300" />
-                    <p className="text-xs text-slate-400">Nenhum compromisso publicado.</p>
-                    {admin && (
-                      <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
-                        + Adicionar
-                      </button>
-                    )}
+                    <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
+                    <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
+                      + Adicionar
+                    </button>
                   </div>
                 )}
                 {items.map((c) => (
@@ -541,8 +538,8 @@ export function OracaoPage() {
                     dataHora={c.dataHora}
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
-                    showActions={!!admin}
-                    onEdit={admin ? () => openModalEdit(c, true) : undefined}
+                    showActions={true}
+                    onEdit={() => openModalEdit(c, true)}
                     onDelete={() => handleDeletarEquipe(c.id)}
                   />
                 ))}

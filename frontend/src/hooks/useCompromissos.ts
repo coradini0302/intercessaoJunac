@@ -25,16 +25,20 @@ export function useMeusCompromissos(semana: number | undefined) {
   });
 }
 
-// ── Meus Compromissos Intercedidos (/api/compromissos-intercedidos) ───────────
-export function useMeusIntercedidos(ativo?: boolean) {
+// ── Compromissos Intercedidos (/api/compromissos-intercedidos) ────────────────
+export function useIntercedidos(ativo?: boolean) {
   return useQuery<CompromissoIntercedido[]>({
-    queryKey: ['meus-intercedidos', ativo],
+    queryKey: ['intercedidos', ativo],
     queryFn: async () => {
       const params = ativo !== undefined ? `?ativo=${ativo}` : '';
-      const { data } = await api.get(`/api/compromissos-intercedidos/meus${params}`);
+      const { data } = await api.get(`/api/compromissos-intercedidos${params}`);
       return Array.isArray(data) ? data : [];
     },
   });
+}
+
+export function useMeusIntercedidos(ativo?: boolean) {
+  return useIntercedidos(ativo);
 }
 
 type IntercedidoPayload = { titulo: string; conteudo?: string | null; dataHora?: string | null; diaInteiro?: boolean };

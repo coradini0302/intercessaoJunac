@@ -1,3 +1,4 @@
+using Intercessao.Constants;
 using Intercessao.Data;
 using Intercessao.DTOs;
 using Intercessao.Entities;
@@ -16,13 +17,11 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     private string UserId => User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                              ?? User.FindFirst("sub")?.Value ?? string.Empty;
 
-    /// <summary>Meus compromissos (filtrado pelo usuário logado).</summary>
-    [HttpGet("meus")]
-    public async Task<IActionResult> MeusCompromissos([FromQuery] bool? ativo)
+    /// <summary>Lista todos (visível para todos).</summary>
+    [HttpGet]
+    public async Task<IActionResult> ListarTodos([FromQuery] bool? ativo)
     {
-        var query = db.CompromissosIntercedidos
-            .Include(c => c.Usuario)
-            .Where(c => c.UsuarioId == UserId);
+        var query = db.CompromissosIntercedidos.Include(c => c.Usuario).AsQueryable();
         if (ativo.HasValue) query = query.Where(c => c.Ativo == ativo.Value);
         var lista = await query
             .OrderBy(c => c.DataHora == null)
@@ -33,6 +32,7 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Criar([FromBody] CriarCompromisoIntercedidoRequest request)
     {
         var compromisso = new CompromisoIntercedido
@@ -54,11 +54,12 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarCompromisoIntercedidoRequest request)
     {
         var compromisso = await db.CompromissosIntercedidos
             .Include(c => c.Usuario)
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
@@ -73,11 +74,12 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPatch("{id:int}/arquivar")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Arquivar(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
             .Include(c => c.Usuario)
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
@@ -89,10 +91,11 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Excluir(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
