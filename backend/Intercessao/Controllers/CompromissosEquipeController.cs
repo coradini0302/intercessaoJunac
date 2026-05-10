@@ -52,6 +52,7 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Criar([FromBody] CriarCompromissoEquipeRequest request)
     {
         var encontroExiste = await db.Encontros.AnyAsync(e => e.Id == request.EncontroId);
@@ -78,6 +79,7 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarCompromissoEquipeRequest request)
     {
         var compromisso = await db.CompromissosEquipe
@@ -98,6 +100,7 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Excluir(int id)
     {
         var compromisso = await db.CompromissosEquipe

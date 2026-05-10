@@ -290,7 +290,7 @@ export function OracaoPage() {
   const { data: encontro } = useEncontroAtivo();
   const semanaAtual = getSemanaAtual();
 
-  const [aba, setAba] = useState<'intercessao' | 'equipe'>(admin ? 'intercessao' : 'equipe');
+  const [aba, setAba] = useState<'intercessao' | 'equipe'>('intercessao');
   const [openWeeks, setOpenWeeks] = useState<Set<number>>(new Set([semanaAtual]));
   const [mostraArquivados, setMostraArquivados] = useState(false);
 
@@ -436,24 +436,17 @@ export function OracaoPage() {
 
       {/* Tab nav */}
       <div className="flex bg-white border-b border-slate-100 sticky top-14 md:top-16 z-10">
-        {admin && (
+        {(['intercessao', 'equipe'] as const).map((tab) => (
           <button
-            onClick={() => setAba('intercessao')}
+            key={tab}
+            onClick={() => setAba(tab)}
             className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              aba === 'intercessao' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+              aba === tab ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            Compromissos Intercessão
+            {tab === 'intercessao' ? 'Compromissos Intercessão' : 'Equipe Intercedida'}
           </button>
-        )}
-        <button
-          onClick={() => setAba('equipe')}
-          className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-            aba === 'equipe' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          Equipe Intercedida
-        </button>
+        ))}
       </div>
 
       {/* ── Aba: Compromissos Intercessão ── */}
@@ -503,9 +496,9 @@ export function OracaoPage() {
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
                     arquivado={!c.ativo}
-                    showActions={!!admin}
-                    onEdit={admin ? () => openModalEdit(c, false) : undefined}
-                    onArchivar={admin ? () => handleArquivar(c.id, c.ativo) : undefined}
+                    showActions={true}
+                    onEdit={() => openModalEdit(c, false)}
+                    onArchivar={() => handleArquivar(c.id, c.ativo)}
                     onDelete={() => handleDeletarMeus(c.id)}
                   />
                 ))}
@@ -527,15 +520,17 @@ export function OracaoPage() {
               <SemanaSection
                 key={sem} semana={sem} semanaAtual={semanaAtual}
                 open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, true)} canAdd={true}
+                onAdd={() => openModalAdd(sem, true)} canAdd={!!admin}
               >
                 {items.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <BookOpen size={18} className="text-slate-300" />
                     <p className="text-xs text-slate-400">Nenhum compromisso publicado.</p>
-                    <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
-                      + Adicionar
-                    </button>
+                    {admin && (
+                      <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
+                        + Adicionar
+                      </button>
+                    )}
                   </div>
                 )}
                 {items.map((c) => (
@@ -546,8 +541,8 @@ export function OracaoPage() {
                     dataHora={c.dataHora}
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
-                    showActions={true}
-                    onEdit={() => openModalEdit(c, true)}
+                    showActions={!!admin}
+                    onEdit={admin ? () => openModalEdit(c, true) : undefined}
                     onDelete={() => handleDeletarEquipe(c.id)}
                   />
                 ))}
