@@ -24,7 +24,7 @@ export function OracaoPage() {
   const admin = user && isAdmin(user.role);
   const { data: encontro } = useEncontroAtivo();
 
-  const [aba, setAba] = useState<'meus' | 'semana'>('meus');
+  const [aba, setAba] = useState<'intercessao' | 'equipe'>('intercessao');
   const [mostraArquivados, setMostraArquivados] = useState(false);
 
   // Meus Compromissos form state
@@ -168,29 +168,29 @@ export function OracaoPage() {
       {/* Tab nav */}
       <div className="flex bg-white border-b border-slate-100 sticky top-14 md:top-16 z-10">
         <button
-          onClick={() => setAba('meus')}
+          onClick={() => setAba('intercessao')}
           className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-            aba === 'meus'
+            aba === 'intercessao'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
-          Meus Compromissos
+          Compromissos Intercessão
         </button>
         <button
-          onClick={() => setAba('semana')}
+          onClick={() => setAba('equipe')}
           className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-            aba === 'semana'
+            aba === 'equipe'
               ? 'border-primary-500 text-primary-600'
               : 'border-transparent text-slate-500 hover:text-slate-700'
           }`}
         >
-          Intercessão da Semana
+          Equipe Intercedida
         </button>
       </div>
 
-      {/* ── Aba 1: Meus Compromissos ── */}
-      {aba === 'meus' && (
+      {/* ── Aba 1: Compromissos Intercessão ── */}
+      {aba === 'intercessao' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
           <div className="flex items-center justify-between">
             <button
@@ -267,7 +267,7 @@ export function OracaoPage() {
       )}
 
       {/* ── Aba 2: Intercessão da Semana ── */}
-      {aba === 'semana' && (
+      {aba === 'equipe' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
           {admin && (
             <div className="flex justify-end">
