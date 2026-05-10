@@ -171,6 +171,9 @@ public class AvisosController(
         if (!aviso.PermiteComentarios)
             return BadRequest(new { erro = "Comentários desativados neste aviso." });
 
+        if (string.IsNullOrWhiteSpace(request.Texto))
+            return BadRequest(new { erro = "Escreva um comentário." });
+
         var comentario = new AvisoComentario
         {
             AvisoId = id,
@@ -188,15 +191,46 @@ public class AvisosController(
             usuarioId: UserId, nomeUsuario: UserNome,
             entidade: nameof(AvisoComentario), entidadeId: comentario.Id.ToString());
 
-        return Ok(new ComentarioResponse
+        return Ok(MapearComentario(comentario));
+    }
+
+    [HttpPost("{id:int}/comentarios/{comentarioId:int}/midia")]
+    public async Task<IActionResult> UploadMidiaComentario(int id, int comentarioId, IFormFile arquivo)
+    {
+        var comentario = await db.AvisoComentarios
+            .Include(c => c.Usuario)
+            .FirstOrDefaultAsync(c => c.Id == comentarioId && c.AvisoId == id);
+
+        if (comentario is null) return NotFound();
+        if (comentario.UsuarioId != UserId && !User.IsInRole(Roles.Admin) && !User.IsInRole(Roles.DevAdmin))
+            return Forbid();
+
+        if (arquivo.Length > MaxUploadBytes)
+            return BadRequest(new { erro = "Arquivo muito grande. Limite: 5 MB." });
+
+        var ext = Path.GetExtension(arquivo.FileName).ToLowerInvariant();
+        if (!ExtensoesMidia.Contains(ext))
+            return BadRequest(new { erro = "Extensão não permitida." });
+
+        var pasta = Path.Combine(env.WebRootPath ?? "wwwroot", "uploads", "comentarios");
+        Directory.CreateDirectory(pasta);
+
+        var nomeArquivo = $"{comentario.Id}_{Guid.NewGuid():N}{ext}";
+        var caminho = Path.Combine(pasta, nomeArquivo);
+
+        await using (var stream = System.IO.File.Create(caminho))
+            await arquivo.CopyToAsync(stream);
+
+        if (comentario.UrlMidia is not null)
         {
-            Id = comentario.Id,
-            UsuarioId = comentario.UsuarioId,
-            NomeUsuario = comentario.Usuario.Nome,
-            ApelidoUsuario = comentario.Usuario.Apelido,
-            Texto = comentario.Texto,
-            CriadoEm = comentario.CriadoEm
-        });
+            var antigo = Path.Combine(env.WebRootPath ?? "wwwroot", comentario.UrlMidia.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (System.IO.File.Exists(antigo)) System.IO.File.Delete(antigo);
+        }
+
+        comentario.UrlMidia = $"/uploads/comentarios/{nomeArquivo}";
+        await db.SaveChangesAsync();
+
+        return Ok(MapearComentario(comentario));
     }
 
     [HttpDelete("{id:int}/comentarios/{comentarioId:int}")]
@@ -241,15 +275,18 @@ public class AvisosController(
     private static AvisoResponse MapearDetalhado(Aviso a)
     {
         var response = MapearResumo(a);
-        response.Comentarios = a.Comentarios?.Select(c => new ComentarioResponse
-        {
-            Id = c.Id,
-            UsuarioId = c.UsuarioId,
-            NomeUsuario = c.Usuario?.Nome ?? string.Empty,
-            ApelidoUsuario = c.Usuario?.Apelido,
-            Texto = c.Texto,
-            CriadoEm = c.CriadoEm
-        }).ToList() ?? [];
+        response.Comentarios = a.Comentarios?.Select(MapearComentario).ToList() ?? [];
         return response;
     }
+
+    private static ComentarioResponse MapearComentario(AvisoComentario c) => new()
+    {
+        Id = c.Id,
+        UsuarioId = c.UsuarioId,
+        NomeUsuario = c.Usuario?.Nome ?? string.Empty,
+        ApelidoUsuario = c.Usuario?.Apelido,
+        Texto = c.Texto,
+        UrlMidia = c.UrlMidia,
+        CriadoEm = c.CriadoEm
+    };
 }

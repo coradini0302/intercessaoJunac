@@ -21,7 +21,7 @@ public class AtualizarAvisoRequest
 
 public class ComentarioRequest
 {
-    [Required, MinLength(1), MaxLength(500)] public string Texto { get; set; } = string.Empty;
+    [MaxLength(500)] public string Texto { get; set; } = string.Empty;
 }
 
 public class ComentarioResponse
@@ -31,6 +31,7 @@ public class ComentarioResponse
     public string NomeUsuario { get; set; } = string.Empty;
     public string? ApelidoUsuario { get; set; }
     public string Texto { get; set; } = string.Empty;
+    public string? UrlMidia { get; set; }
     public DateTime CriadoEm { get; set; }
 }
 

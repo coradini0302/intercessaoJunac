@@ -8,5 +8,6 @@ public class AvisoComentario
     public string UsuarioId { get; set; } = string.Empty;
     public ApplicationUser Usuario { get; set; } = null!;
     public string Texto { get; set; } = string.Empty;
+    public string? UrlMidia { get; set; }
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 }

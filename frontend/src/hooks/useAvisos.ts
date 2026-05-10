@@ -81,6 +81,21 @@ export function useDeletarAviso() {
   });
 }
 
+export function useUploadComentarioMidia() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ avisoId, comentarioId, file }: { avisoId: number; comentarioId: number; file: File }) => {
+      const form = new FormData();
+      form.append('arquivo', file);
+      const { data } = await api.post(`/api/avisos/${avisoId}/comentarios/${comentarioId}/midia`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return data as { urlMidia: string };
+    },
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['aviso', vars.avisoId] }),
+  });
+}
+
 export function useUploadMidiaAviso() {
   const qc = useQueryClient();
   return useMutation({

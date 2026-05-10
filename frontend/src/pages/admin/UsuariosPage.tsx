@@ -22,7 +22,6 @@ interface UserForm {
   nome: string;
   apelido: string;
   login: string;
-  email: string;
   role: Role;
 }
 
@@ -50,7 +49,6 @@ export function UsuariosPage() {
         nome: values.nome,
         apelido: values.apelido || null,
         login: values.login,
-        email: values.email,
         role: values.role,
       });
       setTempPassword(res.senhaTemporaria);
@@ -103,7 +101,7 @@ export function UsuariosPage() {
   };
 
   const openEdit = (u: UsuarioAdmin) => {
-    reset({ nome: u.nome, apelido: u.apelido ?? '', login: u.login, email: u.email, role: u.role });
+    reset({ nome: u.nome, apelido: u.apelido ?? '', login: u.login, role: u.role });
     setEditUser(u);
   };
 
@@ -171,8 +169,7 @@ export function UsuariosPage() {
           <Input label="Nome *" placeholder="Nome completo" error={errors.nome?.message} {...register('nome', { required: 'Obrigatório' })} />
           <Input label="Apelido" placeholder="Nome preferido (opcional)" {...register('apelido')} />
           <Input label="Login *" placeholder="login de acesso" error={errors.login?.message} {...register('login', { required: 'Obrigatório' })} />
-          <Input label="E-mail *" type="email" placeholder="email@exemplo.com" error={errors.email?.message} {...register('email', { required: 'Obrigatório' })} />
-          <div className="flex flex-col gap-1">
+<div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-slate-700">Perfil</label>
             <select {...register('role')} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400">
               <option value="Intercessor">Intercessor</option>

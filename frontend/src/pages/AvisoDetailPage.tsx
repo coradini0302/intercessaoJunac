@@ -1,8 +1,8 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { MessageCircle, Send, Trash2, Edit2, Image } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { MessageCircle, Send, Trash2, Edit2, Image, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useAviso, useComentarAviso, useDeletarComentario, useEditarAviso, useUploadMidiaAviso } from '../hooks/useAvisos';
+import { useAviso, useComentarAviso, useDeletarComentario, useEditarAviso, useUploadMidiaAviso, useUploadComentarioMidia } from '../hooks/useAvisos';
 import { TopBar } from '../components/layout/TopBar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -26,22 +26,51 @@ export function AvisoDetailPage() {
   const deletarComentario = useDeletarComentario();
   const editarAviso = useEditarAviso();
   const uploadMidia = useUploadMidiaAviso();
+  const uploadComentarioMidia = useUploadComentarioMidia();
 
   const [texto, setTexto] = useState('');
   const [sending, setSending] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(false);
+  const [imagemPendente, setImagemPendente] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit } = useForm({
     values: aviso ? { titulo: aviso.titulo, conteudo: aviso.conteudo, permiteComentarios: aviso.permiteComentarios, ativo: aviso.ativo } : undefined,
   });
 
+  const setImagem = (file: File | null) => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setImagemPendente(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const imageItem = Array.from(e.clipboardData.items).find(item => item.type.startsWith('image/'));
+    if (!imageItem) return;
+    e.preventDefault();
+    const file = imageItem.getAsFile();
+    if (file) setImagem(file);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImagem(file);
+    e.target.value = '';
+  };
+
   const handleComment = async () => {
-    if (!texto.trim() || !aviso) return;
+    if ((!texto.trim() && !imagemPendente) || !aviso) return;
     setSending(true);
     try {
-      await comentar.mutateAsync({ avisoId: aviso.id, texto: texto.trim() });
+      const textoEnvio = texto.trim() || '.';
+      const res = await comentar.mutateAsync({ avisoId: aviso.id, texto: textoEnvio });
+      if (imagemPendente && res?.id) {
+        await uploadComentarioMidia.mutateAsync({ avisoId: aviso.id, comentarioId: res.id, file: imagemPendente });
+      }
       setTexto('');
+      setImagem(null);
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
@@ -88,6 +117,7 @@ export function AvisoDetailPage() {
   if (!aviso) return null;
 
   const midiaUrl = buildImageUrl(aviso.urlMidia);
+  const podeSendar = texto.trim().length > 0 || !!imagemPendente;
 
   return (
     <div className="flex flex-col">
@@ -139,10 +169,7 @@ export function AvisoDetailPage() {
 
             {aviso.comentarios?.map((c) => (
               <div key={c.id} className="flex items-start gap-2.5 mb-3">
-                <Avatar
-                  nome={c.nomeUsuario}
-                  size="xs"
-                />
+                <Avatar nome={c.nomeUsuario} size="xs" />
                 <div className="flex-1 bg-white rounded-2xl px-3 py-2.5 shadow-card border border-slate-100">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold text-slate-700">
@@ -162,29 +189,71 @@ export function AvisoDetailPage() {
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600 mt-0.5">{c.texto}</p>
+                  {c.texto !== '.' && (
+                    <p className="text-sm text-slate-600 mt-0.5">{c.texto}</p>
+                  )}
+                  {c.urlMidia && (
+                    <img
+                      src={buildImageUrl(c.urlMidia)!}
+                      alt="Imagem do comentário"
+                      className="mt-2 rounded-xl object-cover w-48 h-auto"
+                    />
+                  )}
                 </div>
               </div>
             ))}
 
-            <div className="flex items-center gap-2 mt-2">
+            {/* Input de comentário */}
+            <div className="flex items-end gap-2 mt-2">
               <Avatar nome={user?.nome ?? ''} size="xs" />
-              <div className="flex-1 flex items-center gap-2 bg-white rounded-2xl px-3 py-2 shadow-card border border-slate-100">
-                <input
-                  value={texto}
-                  onChange={(e) => setTexto(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleComment()}
-                  placeholder="Escreva um comentário..."
-                  maxLength={500}
-                  className="flex-1 text-sm outline-none text-slate-700 placeholder:text-slate-400 bg-transparent"
-                />
-                <button
-                  onClick={handleComment}
-                  disabled={!texto.trim() || sending}
-                  className="text-primary-500 disabled:opacity-30"
-                >
-                  <Send size={18} />
-                </button>
+              <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
+                {previewUrl && (
+                  <div className="relative p-2 pb-0">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="rounded-xl object-cover w-48 h-auto"
+                    />
+                    <button
+                      onClick={() => setImagem(null)}
+                      className="absolute top-3 left-3 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <input
+                    value={texto}
+                    onChange={(e) => setTexto(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleComment()}
+                    onPaste={handlePaste}
+                    placeholder="Escreva um comentário..."
+                    maxLength={500}
+                    className="flex-1 text-sm outline-none text-slate-700 placeholder:text-slate-400 bg-transparent"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-slate-400 hover:text-primary-500 transition-colors"
+                    title="Anexar imagem"
+                  >
+                    <Image size={17} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,.gif"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+                  <button
+                    onClick={handleComment}
+                    disabled={!podeSendar || sending}
+                    className="text-primary-500 disabled:opacity-30"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

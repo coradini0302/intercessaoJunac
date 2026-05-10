@@ -85,14 +85,11 @@ public class UsuariosController(
         if (await userManager.FindByNameAsync(request.Login) is not null)
             return Conflict(new { erro = "Login já em uso." });
 
-        if (await userManager.FindByEmailAsync(request.Email) is not null)
-            return Conflict(new { erro = "E-mail já cadastrado." });
-
         var senhaTemp = GerarSenhaTemporaria();
         var user = new ApplicationUser
         {
             UserName = request.Login,
-            Email = request.Email,
+            Email = $"{request.Login}@intercejunac.com",
             Nome = request.Nome,
             Apelido = request.Apelido,
             Ativo = true,

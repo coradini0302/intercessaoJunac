@@ -71,7 +71,7 @@ export function useRemoverFoto() {
 export function useCriarUsuario() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { nome: string; apelido?: string | null; login: string; email: string; role: string }) => {
+    mutationFn: async (body: { nome: string; apelido?: string | null; login: string; role: string }) => {
       const { data } = await api.post('/api/usuarios', body);
       return data as { usuario: UsuarioAdmin; senhaTemporaria: string; mensagem: string };
     },

@@ -10,6 +10,7 @@ export function useAgendaAtual(encontroId: number | undefined) {
       return data;
     },
     enabled: !!encontroId,
+    retry: false,
   });
 }
 

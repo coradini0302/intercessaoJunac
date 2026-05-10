@@ -7,7 +7,6 @@ public class CriarUsuarioRequest
     [Required] public string Nome { get; set; } = string.Empty;
     public string? Apelido { get; set; }
     [Required] public string Login { get; set; } = string.Empty;
-    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
     [Required] public string Role { get; set; } = string.Empty;
 }
 

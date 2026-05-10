@@ -122,6 +122,7 @@ static async Task ApplySchemaPatches(AppDbContext db)
     var patches = new[]
     {
         "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
+        "ALTER TABLE AvisoComentarios ADD COLUMN UrlMidia TEXT",
     };
     foreach (var sql in patches)
     {
