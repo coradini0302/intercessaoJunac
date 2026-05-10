@@ -17,8 +17,8 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     private string UserId => User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                              ?? User.FindFirst("sub")?.Value ?? string.Empty;
 
-    /// <summary>Meus compromissos de intercessão (filtrados pelo usuário logado).</summary>
     [HttpGet("meus")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> MeusCompromissos([FromQuery] bool? ativo)
     {
         var query = db.CompromissosIntercedidos
@@ -33,8 +33,8 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
         return Ok(lista.Select(Mapear));
     }
 
-    // Qualquer usuário pode criar o próprio compromisso
     [HttpPost]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Criar([FromBody] CriarCompromisoIntercedidoRequest request)
     {
         var compromisso = new CompromisoIntercedido

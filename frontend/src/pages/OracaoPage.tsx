@@ -290,7 +290,7 @@ export function OracaoPage() {
   const { data: encontro } = useEncontroAtivo();
   const semanaAtual = getSemanaAtual();
 
-  const [aba, setAba] = useState<'intercessao' | 'equipe'>('intercessao');
+  const [aba, setAba] = useState<'intercessao' | 'equipe'>(admin ? 'intercessao' : 'equipe');
   const [openWeeks, setOpenWeeks] = useState<Set<number>>(new Set([semanaAtual]));
   const [mostraArquivados, setMostraArquivados] = useState(false);
 
@@ -436,17 +436,24 @@ export function OracaoPage() {
 
       {/* Tab nav */}
       <div className="flex bg-white border-b border-slate-100 sticky top-14 md:top-16 z-10">
-        {(['intercessao', 'equipe'] as const).map((tab) => (
+        {admin && (
           <button
-            key={tab}
-            onClick={() => setAba(tab)}
+            onClick={() => setAba('intercessao')}
             className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              aba === tab ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+              aba === 'intercessao' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            {tab === 'intercessao' ? 'Compromissos Intercessão' : 'Equipe Intercedida'}
+            Compromissos Intercessão
           </button>
-        ))}
+        )}
+        <button
+          onClick={() => setAba('equipe')}
+          className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+            aba === 'equipe' ? 'border-primary-500 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Equipe Intercedida
+        </button>
       </div>
 
       {/* ── Aba: Compromissos Intercessão ── */}
