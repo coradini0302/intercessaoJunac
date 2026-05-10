@@ -26,11 +26,12 @@ export function useMeusCompromissos(semana: number | undefined) {
 }
 
 // ── Meus Compromissos Intercedidos (/api/compromissos-intercedidos) ───────────
-export function useMeusIntercedidos(ativo = true) {
+export function useMeusIntercedidos(ativo?: boolean) {
   return useQuery<CompromissoIntercedido[]>({
     queryKey: ['meus-intercedidos', ativo],
     queryFn: async () => {
-      const { data } = await api.get(`/api/compromissos-intercedidos/meus?ativo=${ativo}`);
+      const params = ativo !== undefined ? `?ativo=${ativo}` : '';
+      const { data } = await api.get(`/api/compromissos-intercedidos/meus${params}`);
       return Array.isArray(data) ? data : [];
     },
   });

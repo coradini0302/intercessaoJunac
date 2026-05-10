@@ -17,35 +17,23 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     private string UserId => User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                              ?? User.FindFirst("sub")?.Value ?? string.Empty;
 
-    /// <summary>Meus compromissos de oração para meus intercedidos.</summary>
+    /// <summary>Meus compromissos de intercessão (filtrados pelo usuário logado).</summary>
     [HttpGet("meus")]
     public async Task<IActionResult> MeusCompromissos([FromQuery] bool? ativo)
     {
         var query = db.CompromissosIntercedidos
             .Include(c => c.Usuario)
             .Where(c => c.UsuarioId == UserId);
-
         if (ativo.HasValue) query = query.Where(c => c.Ativo == ativo.Value);
-
-        var lista = await query.OrderBy(c => c.DataHora == null).ThenBy(c => c.DataHora).ThenByDescending(c => c.CriadoEm).ToListAsync();
+        var lista = await query
+            .OrderBy(c => c.DataHora == null)
+            .ThenBy(c => c.DataHora)
+            .ThenByDescending(c => c.CriadoEm)
+            .ToListAsync();
         return Ok(lista.Select(Mapear));
     }
 
-    /// <summary>Admin: compromissos de um intercessor específico.</summary>
-    [HttpGet("usuario/{usuarioId}")]
-    [Authorize(Roles = Roles.AdminOuSuperior)]
-    public async Task<IActionResult> PorUsuario(string usuarioId, [FromQuery] bool? ativo)
-    {
-        var query = db.CompromissosIntercedidos
-            .Include(c => c.Usuario)
-            .Where(c => c.UsuarioId == usuarioId);
-
-        if (ativo.HasValue) query = query.Where(c => c.Ativo == ativo.Value);
-
-        var lista = await query.OrderBy(c => c.DataHora == null).ThenBy(c => c.DataHora).ThenByDescending(c => c.CriadoEm).ToListAsync();
-        return Ok(lista.Select(Mapear));
-    }
-
+    // Qualquer usuário pode criar o próprio compromisso
     [HttpPost]
     public async Task<IActionResult> Criar([FromBody] CriarCompromisoIntercedidoRequest request)
     {
@@ -68,11 +56,12 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarCompromisoIntercedidoRequest request)
     {
         var compromisso = await db.CompromissosIntercedidos
             .Include(c => c.Usuario)
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
@@ -86,13 +75,13 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
         return Ok(Mapear(compromisso));
     }
 
-    /// <summary>Arquiva ou desarquiva um compromisso (toggle de Ativo).</summary>
     [HttpPatch("{id:int}/arquivar")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Arquivar(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
             .Include(c => c.Usuario)
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
@@ -104,10 +93,11 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Excluir(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
-            .FirstOrDefaultAsync(c => c.Id == id && c.UsuarioId == UserId);
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
 
