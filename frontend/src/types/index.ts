@@ -161,9 +161,12 @@ export interface CompromissoOracao {
 export interface CompromissoIntercedido {
   id: number;
   titulo: string;
-  conteudo: string;
+  conteudo: string | null;
   ativo: boolean;
   equipeIntercessao: string | null;
+  numeroSemana: number;
+  dataHora: string | null;
+  diaInteiro: boolean;
   criadoEm: string;
   atualizadoEm: string | null;
 }
@@ -176,6 +179,8 @@ export interface CompromissoEquipe {
   semanaAtual: boolean;
   titulo: string;
   conteudo: string | null;
+  dataHora: string | null;
+  diaInteiro: boolean;
   nomeCriadoPor: string;
   criadoEm: string;
   atualizadoEm: string | null;

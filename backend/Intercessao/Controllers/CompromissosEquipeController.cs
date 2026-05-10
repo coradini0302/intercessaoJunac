@@ -31,6 +31,8 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
 
         var lista = await query
             .OrderBy(c => c.NumeroSemana)
+            .ThenBy(c => c.DataHora == null)
+            .ThenBy(c => c.DataHora)
             .ThenBy(c => c.CriadoEm)
             .ToListAsync();
 
@@ -62,6 +64,8 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
             NumeroSemana = request.NumeroSemana,
             Titulo = request.Titulo,
             Conteudo = request.Conteudo,
+            DataHora = request.DataHora,
+            DiaInteiro = request.DiaInteiro,
             CriadoPorId = UserId,
             CriadoEm = DateTime.UtcNow
         };
@@ -87,6 +91,8 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
 
         compromisso.Titulo = request.Titulo;
         compromisso.Conteudo = request.Conteudo;
+        compromisso.DataHora = request.DataHora;
+        compromisso.DiaInteiro = request.DiaInteiro;
         compromisso.AtualizadoEm = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
@@ -123,6 +129,8 @@ public class CompromissosEquipeController(AppDbContext db) : ControllerBase
             SemanaAtual = semanaAtual == c.NumeroSemana,
             Titulo = c.Titulo,
             Conteudo = c.Conteudo,
+            DataHora = c.DataHora,
+            DiaInteiro = c.DiaInteiro,
             CriadoPorId = c.CriadoPorId,
             NomeCriadoPor = c.CriadoPor?.Nome ?? string.Empty,
             CriadoEm = c.CriadoEm,

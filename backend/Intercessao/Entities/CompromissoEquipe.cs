@@ -8,7 +8,9 @@ public class CompromissoEquipe
 
     public int NumeroSemana { get; set; }
     public string Titulo { get; set; } = string.Empty;
-    public string Conteudo { get; set; } = string.Empty;
+    public string? Conteudo { get; set; }
+    public DateTime? DataHora { get; set; }
+    public bool DiaInteiro { get; set; } = true;
 
     public string CriadoPorId { get; set; } = string.Empty;
     public ApplicationUser CriadoPor { get; set; } = null!;

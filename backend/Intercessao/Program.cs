@@ -137,10 +137,18 @@ static async Task ApplySchemaPatches(AppDbContext db)
         ? [
             """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "EquipeIntercessao" TEXT""",
             """ALTER TABLE "AvisoComentarios" ADD COLUMN IF NOT EXISTS "UrlMidia" TEXT""",
+            """ALTER TABLE "CompromissosEquipe" ADD COLUMN IF NOT EXISTS "DataHora" TIMESTAMPTZ""",
+            """ALTER TABLE "CompromissosEquipe" ADD COLUMN IF NOT EXISTS "DiaInteiro" BOOLEAN DEFAULT true""",
+            """ALTER TABLE "CompromissosIntercedidos" ADD COLUMN IF NOT EXISTS "DataHora" TIMESTAMPTZ""",
+            """ALTER TABLE "CompromissosIntercedidos" ADD COLUMN IF NOT EXISTS "DiaInteiro" BOOLEAN DEFAULT true""",
           ]
         : [
             "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
             "ALTER TABLE AvisoComentarios ADD COLUMN UrlMidia TEXT",
+            "ALTER TABLE CompromissosEquipe ADD COLUMN DataHora TEXT",
+            "ALTER TABLE CompromissosEquipe ADD COLUMN DiaInteiro INTEGER DEFAULT 1",
+            "ALTER TABLE CompromissosIntercedidos ADD COLUMN DataHora TEXT",
+            "ALTER TABLE CompromissosIntercedidos ADD COLUMN DiaInteiro INTEGER DEFAULT 1",
           ];
 
     foreach (var sql in patches)

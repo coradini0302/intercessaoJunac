@@ -2,6 +2,7 @@ using Intercessao.Constants;
 using Intercessao.Data;
 using Intercessao.DTOs;
 using Intercessao.Entities;
+using Intercessao.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
 
         if (ativo.HasValue) query = query.Where(c => c.Ativo == ativo.Value);
 
-        var lista = await query.OrderByDescending(c => c.CriadoEm).ToListAsync();
+        var lista = await query.OrderBy(c => c.DataHora == null).ThenBy(c => c.DataHora).ThenByDescending(c => c.CriadoEm).ToListAsync();
         return Ok(lista.Select(Mapear));
     }
 
@@ -41,7 +42,7 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
 
         if (ativo.HasValue) query = query.Where(c => c.Ativo == ativo.Value);
 
-        var lista = await query.OrderByDescending(c => c.CriadoEm).ToListAsync();
+        var lista = await query.OrderBy(c => c.DataHora == null).ThenBy(c => c.DataHora).ThenByDescending(c => c.CriadoEm).ToListAsync();
         return Ok(lista.Select(Mapear));
     }
 
@@ -54,6 +55,8 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
             Titulo = request.Titulo,
             Conteudo = request.Conteudo,
             Ativo = true,
+            DataHora = request.DataHora,
+            DiaInteiro = request.DiaInteiro,
             CriadoEm = DateTime.UtcNow
         };
 
@@ -75,6 +78,8 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
 
         compromisso.Titulo = request.Titulo;
         compromisso.Conteudo = request.Conteudo;
+        compromisso.DataHora = request.DataHora;
+        compromisso.DiaInteiro = request.DiaInteiro;
         compromisso.AtualizadoEm = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
@@ -119,10 +124,22 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
         ApelidoUsuario = c.Usuario?.Apelido,
         FotoUrl = c.Usuario?.FotoUrl,
         EquipeIntercessao = c.Usuario?.EquipeIntercessao,
+        NumeroSemana = CalcularNumeroSemana(c.DataHora ?? c.CriadoEm),
         Titulo = c.Titulo,
         Conteudo = c.Conteudo,
         Ativo = c.Ativo,
+        DataHora = c.DataHora,
+        DiaInteiro = c.DiaInteiro,
         CriadoEm = c.CriadoEm,
         AtualizadoEm = c.AtualizadoEm
     };
+
+    private static int CalcularNumeroSemana(DateTime data)
+    {
+        var date = data.Date;
+        if (date < SemanaOracaoService.DataInicioPeriodo || date > SemanaOracaoService.DataFimPeriodo.Date)
+            return 0;
+        var dias = (date - SemanaOracaoService.DataInicioPeriodo).Days;
+        return (dias / 7) + 1;
+    }
 }

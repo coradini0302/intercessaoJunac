@@ -8,11 +8,11 @@ import { useAuth } from '../../context/AuthContext';
 import { isAdmin } from '../../lib/utils';
 import { usePerfil } from '../../hooks/useUsuarios';
 
-const mainLinks = [
-  { to: '/dashboard', icon: Home, label: 'Início' },
-  { to: '/avisos', icon: Megaphone, label: 'Avisos' },
-  { to: '/escalas', icon: Calendar, label: 'Pregações' },
-  { to: '/oracao', icon: BookOpen, label: 'Oração' },
+const allMainLinks = [
+  { to: '/dashboard', icon: Home, label: 'Início', adminOnly: false },
+  { to: '/avisos', icon: Megaphone, label: 'Avisos', adminOnly: true },
+  { to: '/escalas', icon: Calendar, label: 'Pregações', adminOnly: false },
+  { to: '/oracao', icon: BookOpen, label: 'Oração', adminOnly: false },
 ];
 
 export function BottomNav() {
@@ -55,7 +55,7 @@ export function BottomNav() {
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-slate-100 safe-bottom">
         <div className="flex items-center justify-around px-1">
-          {mainLinks.map(({ to, icon: Icon, label }) => (
+          {allMainLinks.filter(l => !l.adminOnly || admin).map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}

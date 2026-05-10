@@ -36,10 +36,12 @@ export function useMeusIntercedidos(ativo = true) {
   });
 }
 
+type IntercedidoPayload = { titulo: string; conteudo?: string | null; dataHora?: string | null; diaInteiro?: boolean };
+
 export function useAdicionarIntercedido() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { titulo: string; conteudo: string }) => {
+    mutationFn: async (body: IntercedidoPayload) => {
       const { data } = await api.post('/api/compromissos-intercedidos', body);
       return data as CompromissoIntercedido;
     },
@@ -52,7 +54,7 @@ export function useAdicionarIntercedido() {
 export function useEditarIntercedido() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id: number; titulo: string; conteudo: string }) => {
+    mutationFn: async ({ id, ...body }: { id: number } & IntercedidoPayload) => {
       const { data } = await api.put(`/api/compromissos-intercedidos/${id}`, body);
       return data as CompromissoIntercedido;
     },
@@ -98,10 +100,12 @@ export function useCompromissosEquipe(encontroId: number | undefined) {
   });
 }
 
+type EquipePayload = { titulo: string; conteudo?: string | null; dataHora?: string | null; diaInteiro?: boolean };
+
 export function useAdicionarCompromissoEquipe() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { encontroId: number; numeroSemana: number; titulo: string; conteudo: string }) => {
+    mutationFn: async (body: { encontroId: number; numeroSemana: number } & EquipePayload) => {
       const { data } = await api.post('/api/compromissos-equipe', body);
       return data as CompromissoEquipe;
     },
@@ -114,7 +118,7 @@ export function useAdicionarCompromissoEquipe() {
 export function useEditarCompromissoEquipe() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id: number; titulo: string; conteudo: string }) => {
+    mutationFn: async ({ id, ...body }: { id: number } & EquipePayload) => {
       const { data } = await api.put(`/api/compromissos-equipe/${id}`, body);
       return data as CompromissoEquipe;
     },
