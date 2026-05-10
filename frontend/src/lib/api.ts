@@ -1,14 +1,16 @@
 import axios, { AxiosError } from 'axios';
 import type { ApiError } from '../types';
-import { mockAdapter } from './mockAdapter';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-export const IS_MOCK = import.meta.env.VITE_MOCK === 'true';
+// Em produção (Railway), config.js define window.__API_URL__ em runtime.
+// Em dev local, usa VITE_API_URL do .env.
+const BASE_URL: string =
+  (window as { __API_URL__?: string }).__API_URL__ ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
 
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  adapter: IS_MOCK ? mockAdapter : undefined,
 });
 
 api.interceptors.request.use((config) => {
