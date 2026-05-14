@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Home, Megaphone, Calendar, BookOpen, CalendarDays,
-  Vote, FileText, Users, Lock, Settings, LogOut,
+  Vote, FileText, Users, Lock, Settings, LogOut, ClipboardList,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePerfil } from '../../hooks/useUsuarios';
@@ -17,6 +17,7 @@ const navLinks = [
   { to: '/votacoes', icon: Vote, label: 'Votações' },
   { to: '/anotacoes', icon: FileText, label: 'Anotações' },
   { to: '/equipe', icon: Users, label: 'Equipe' },
+  { to: '/reuniao-resumos', icon: ClipboardList, label: 'Resumo - Reuniões' },
 ];
 
 const adminLinks = [

@@ -225,6 +225,17 @@ export interface Votacao {
   opcoes: OpcaoVotacao[];
 }
 
+export interface ReuniaoResumo {
+  id: number;
+  titulo: string;
+  conteudo: string;
+  dataReuniao: string;
+  criadoPorId: string;
+  nomeCriador: string;
+  criadoEm: string;
+  atualizadoEm: string | null;
+}
+
 export interface ApiError {
   erro?: string;
   erros?: string[];

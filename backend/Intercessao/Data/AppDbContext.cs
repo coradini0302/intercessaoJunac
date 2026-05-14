@@ -21,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Votacao> Votacoes => Set<Votacao>();
     public DbSet<VotacaoOpcao> VotacaoOpcoes => Set<VotacaoOpcao>();
     public DbSet<VotacaoVoto> VotacaoVotos => Set<VotacaoVoto>();
+    public DbSet<ReuniaoResumo> ReuniaoResumos => Set<ReuniaoResumo>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -134,6 +135,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasOne(x => x.Usuario).WithMany(x => x.Votos).OnDelete(DeleteBehavior.Restrict);
             // Um voto por usuário por votação
             e.HasIndex(x => new { x.VotacaoId, x.UsuarioId }).IsUnique();
+        });
+
+        builder.Entity<ReuniaoResumo>(e =>
+        {
+            e.Property(x => x.Titulo).HasMaxLength(200).IsRequired();
+            e.HasOne(x => x.CriadoPor).WithMany().HasForeignKey(x => x.CriadoPorId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

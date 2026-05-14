@@ -18,6 +18,7 @@ import { EquipePage } from './pages/EquipePage';
 import { PerfilPage } from './pages/PerfilPage';
 import { UsuariosPage } from './pages/admin/UsuariosPage';
 import { InfoRestritasPage } from './pages/admin/InfoRestritasPage';
+import { ReuniaoResumosPage } from './pages/ReuniaoResumosPage';
 
 function RequireAuth() {
   const { isAuthenticated, user } = useAuth();
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: '/anotacoes', element: <AnotacoesPage /> },
           { path: '/anotacoes/:id', element: <AnotacaoDetailPage /> },
           { path: '/equipe', element: <EquipePage /> },
+          { path: '/reuniao-resumos', element: <ReuniaoResumosPage /> },
           { path: '/perfil', element: <PerfilPage /> },
           {
             element: <RequireAdmin />,
