@@ -11,7 +11,7 @@ import { displayName, isAdmin, roleLabel } from '../../lib/utils';
 const navLinks = [
   { to: '/dashboard', icon: Home, label: 'Início' },
   { to: '/avisos', icon: Megaphone, label: 'Avisos' },
-  { to: '/escalas', icon: Calendar, label: 'Pregadores / Condução' },
+  { to: '/escalas', icon: Calendar, label: 'Responsáveis' },
   { to: '/oracao', icon: BookOpen, label: 'Compromissos' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
   { to: '/votacoes', icon: Vote, label: 'Votações' },

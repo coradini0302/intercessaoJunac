@@ -207,11 +207,11 @@ function SemanaSection({
 
 // ── Modal de evento ───────────────────────────────────────────────────────────
 function ModalEvento({
-  isOpen, onClose, title, form, setForm, onSalvar, loading, showSemana,
+  isOpen, onClose, title, form, setForm, onSalvar, loading, showSemana, showDateTime = true,
 }: {
   isOpen: boolean; onClose: () => void; title: string;
   form: EventoForm; setForm: (f: EventoForm) => void;
-  onSalvar: () => void; loading: boolean; showSemana?: boolean;
+  onSalvar: () => void; loading: boolean; showSemana?: boolean; showDateTime?: boolean;
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}
@@ -245,36 +245,40 @@ function ModalEvento({
           value={form.descricao}
           onChange={(e) => setForm({ ...form, descricao: e.target.value })}
         />
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Data</label>
-          <input
-            type="date"
-            value={form.data}
-            onChange={(e) => setForm({ ...form, data: e.target.value })}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400"
-          />
-        </div>
-        {form.data && (
+        {showDateTime && (
           <>
-            <label className="flex items-center gap-2.5 cursor-pointer">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-slate-700">Data</label>
               <input
-                type="checkbox"
-                checked={form.diaInteiro}
-                onChange={(e) => setForm({ ...form, diaInteiro: e.target.checked })}
-                className="w-4 h-4 rounded accent-primary-600"
+                type="date"
+                value={form.data}
+                onChange={(e) => setForm({ ...form, data: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400"
               />
-              <span className="text-sm text-slate-700">Dia todo</span>
-            </label>
-            {!form.diaInteiro && (
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-slate-700">Horário de início</label>
-                <input
-                  type="time"
-                  value={form.horario}
-                  onChange={(e) => setForm({ ...form, horario: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400"
-                />
-              </div>
+            </div>
+            {form.data && (
+              <>
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.diaInteiro}
+                    onChange={(e) => setForm({ ...form, diaInteiro: e.target.checked })}
+                    className="w-4 h-4 rounded accent-primary-600"
+                  />
+                  <span className="text-sm text-slate-700">Dia todo</span>
+                </label>
+                {!form.diaInteiro && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-slate-700">Horário de início</label>
+                    <input
+                      type="time"
+                      value={form.horario}
+                      onChange={(e) => setForm({ ...form, horario: e.target.value })}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400"
+                    />
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
@@ -384,7 +388,7 @@ export function OracaoPage() {
           await editarEquipe.mutateAsync({ id: realEdit.id, titulo: form.titulo, conteudo: form.descricao || null, dataHora, diaInteiro: form.diaInteiro });
           toast.success('Compromisso atualizado!');
         } else {
-          if (!encontro?.id) return;
+          if (!encontro?.id) { toast.error('Encontro ativo não encontrado.'); return; }
           await adicionarEquipe.mutateAsync({ encontroId: encontro.id, numeroSemana: form.numSemana, titulo: form.titulo, conteudo: form.descricao || null, dataHora, diaInteiro: form.diaInteiro });
           toast.success('Compromisso publicado!');
         }
@@ -563,6 +567,7 @@ export function OracaoPage() {
         onSalvar={handleSalvar}
         loading={loading}
         showSemana={editingEquipe?.id === -1}
+        showDateTime={isEquipeModal}
       />
     </div>
   );

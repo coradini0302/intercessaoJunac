@@ -21,6 +21,7 @@ export function LoginPage() {
   const { login, isAuthenticated, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -34,13 +35,16 @@ export function LoginPage() {
   });
 
   const onSubmit = async (values: FormData) => {
+    setLoginError(null);
     setLoading(true);
     try {
       const { data } = await api.post<LoginResponse>('/api/auth/login', { login: values.login, senha: values.senha });
       login(data);
       window.location.replace(data.trocaSenhaObrigatoria ? '/trocar-senha' : '/dashboard');
     } catch (err) {
-      toast.error(extractErrorMessage(err));
+      const msg = extractErrorMessage(err);
+      setLoginError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -105,6 +109,9 @@ export function LoginPage() {
               <Button type="submit" loading={loading} fullWidth size="lg" className="mt-2">
                 Entrar
               </Button>
+              {loginError && (
+                <p className="text-sm text-red-600 text-center mt-2">{loginError}</p>
+              )}
             </form>
 
             <p className="text-center text-xs text-slate-400 mt-4">

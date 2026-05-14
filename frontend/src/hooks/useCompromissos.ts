@@ -51,7 +51,7 @@ export function useAdicionarIntercedido() {
       return data as CompromissoIntercedido;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['meus-intercedidos'] });
+      qc.invalidateQueries({ queryKey: ['intercedidos'] });
     },
   });
 }
@@ -64,7 +64,7 @@ export function useEditarIntercedido() {
       return data as CompromissoIntercedido;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['meus-intercedidos'] });
+      qc.invalidateQueries({ queryKey: ['intercedidos'] });
     },
   });
 }
@@ -76,7 +76,7 @@ export function useArquivarIntercedido() {
       await api.patch(`/api/compromissos-intercedidos/${id}/arquivar`);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['meus-intercedidos'] });
+      qc.invalidateQueries({ queryKey: ['intercedidos'] });
     },
   });
 }
@@ -88,7 +88,7 @@ export function useDeletarIntercedido() {
       await api.delete(`/api/compromissos-intercedidos/${id}`);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['meus-intercedidos'] });
+      qc.invalidateQueries({ queryKey: ['intercedidos'] });
     },
   });
 }
