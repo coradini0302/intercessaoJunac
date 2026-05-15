@@ -170,6 +170,15 @@ public class AuthController(
         });
     }
 
+    [HttpGet("foto/{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetFoto(string id)
+    {
+        var user = await userManager.FindByIdAsync(id);
+        if (user?.FotoDados == null) return NotFound();
+        return File(user.FotoDados, user.FotoMimeType ?? "image/jpeg");
+    }
+
     [HttpPost("perfil/foto")]
     [Authorize]
     public async Task<IActionResult> UploadFoto(IFormFile foto)
@@ -184,22 +193,12 @@ public class AuthController(
         var user = await userManager.FindByIdAsync(UserId);
         if (user is null) return Unauthorized();
 
-        var pasta = Path.Combine(env.WebRootPath ?? "wwwroot", "uploads", "fotos");
-        Directory.CreateDirectory(pasta);
-
-        // Remove foto anterior
-        if (user.FotoNomeArquivo is not null)
-        {
-            var antigo = Path.Combine(pasta, user.FotoNomeArquivo);
-            if (System.IO.File.Exists(antigo)) System.IO.File.Delete(antigo);
-        }
-
-        var nomeArquivo = $"{user.Id}_{Guid.NewGuid():N}{ext}";
-        await using (var stream = System.IO.File.Create(Path.Combine(pasta, nomeArquivo)))
-            await foto.CopyToAsync(stream);
-
-        user.FotoNomeArquivo = nomeArquivo;
-        user.FotoUrl = $"/uploads/fotos/{nomeArquivo}";
+        using var ms = new MemoryStream();
+        await foto.CopyToAsync(ms);
+        user.FotoDados = ms.ToArray();
+        user.FotoMimeType = foto.ContentType;
+        user.FotoUrl = $"/api/auth/foto/{user.Id}";
+        user.FotoNomeArquivo = null;
         user.AtualizadoEm = DateTime.UtcNow;
         await userManager.UpdateAsync(user);
 
@@ -213,15 +212,10 @@ public class AuthController(
         var user = await userManager.FindByIdAsync(UserId);
         if (user is null) return Unauthorized();
 
-        if (user.FotoNomeArquivo is not null)
-        {
-            var pasta = Path.Combine(env.WebRootPath ?? "wwwroot", "uploads", "fotos");
-            var caminho = Path.Combine(pasta, user.FotoNomeArquivo);
-            if (System.IO.File.Exists(caminho)) System.IO.File.Delete(caminho);
-        }
-
         user.FotoUrl = null;
         user.FotoNomeArquivo = null;
+        user.FotoDados = null;
+        user.FotoMimeType = null;
         user.AtualizadoEm = DateTime.UtcNow;
         await userManager.UpdateAsync(user);
 

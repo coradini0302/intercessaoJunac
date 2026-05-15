@@ -13,6 +13,8 @@ public class ApplicationUser : IdentityUser
 
     public string? FotoUrl { get; set; }
     public string? FotoNomeArquivo { get; set; }
+    public byte[]? FotoDados { get; set; }
+    public string? FotoMimeType { get; set; }
     public string? EquipeIntercessao { get; set; }
 
     public ICollection<EscalaParticipante> EscalasParticipadas { get; set; } = [];

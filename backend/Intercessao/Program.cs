@@ -142,6 +142,8 @@ static async Task ApplySchemaPatches(AppDbContext db)
             """ALTER TABLE "CompromissosIntercedidos" ADD COLUMN IF NOT EXISTS "DataHora" TIMESTAMPTZ""",
             """ALTER TABLE "CompromissosIntercedidos" ADD COLUMN IF NOT EXISTS "DiaInteiro" BOOLEAN DEFAULT true""",
             """CREATE TABLE IF NOT EXISTS "ReuniaoResumos" ("Id" SERIAL PRIMARY KEY,"Titulo" VARCHAR(200) NOT NULL,"Conteudo" TEXT NOT NULL,"DataReuniao" TIMESTAMPTZ NOT NULL,"CriadoPorId" TEXT NOT NULL,"CriadoEm" TIMESTAMPTZ NOT NULL,"AtualizadoEm" TIMESTAMPTZ)""",
+            """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "FotoDados" BYTEA""",
+            """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "FotoMimeType" VARCHAR(100)""",
           ]
         : [
             "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
@@ -151,6 +153,8 @@ static async Task ApplySchemaPatches(AppDbContext db)
             "ALTER TABLE CompromissosIntercedidos ADD COLUMN DataHora TEXT",
             "ALTER TABLE CompromissosIntercedidos ADD COLUMN DiaInteiro INTEGER DEFAULT 1",
             "CREATE TABLE IF NOT EXISTS ReuniaoResumos (Id INTEGER PRIMARY KEY AUTOINCREMENT,Titulo TEXT NOT NULL,Conteudo TEXT NOT NULL,DataReuniao TEXT NOT NULL,CriadoPorId TEXT NOT NULL,CriadoEm TEXT NOT NULL,AtualizadoEm TEXT)",
+            "ALTER TABLE AspNetUsers ADD COLUMN FotoDados BLOB",
+            "ALTER TABLE AspNetUsers ADD COLUMN FotoMimeType TEXT",
           ];
 
     foreach (var sql in patches)
