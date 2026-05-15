@@ -32,6 +32,7 @@ public class ComentarioResponse
     public string? ApelidoUsuario { get; set; }
     public string Texto { get; set; } = string.Empty;
     public string? UrlMidia { get; set; }
+    public string? FotoUrl { get; set; }
     public DateTime CriadoEm { get; set; }
 }
 

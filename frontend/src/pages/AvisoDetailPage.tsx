@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { MessageCircle, Send, Trash2, Edit2, Image, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { usePerfil } from '../hooks/useUsuarios';
 import { useAviso, useComentarAviso, useDeletarComentario, useEditarAviso, useUploadMidiaAviso, useUploadComentarioMidia } from '../hooks/useAvisos';
 import { TopBar } from '../components/layout/TopBar';
 import { Card } from '../components/ui/Card';
@@ -18,6 +19,7 @@ import { useForm } from 'react-hook-form';
 export function AvisoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { data: perfil } = usePerfil();
   const avisoId = Number(id);
   const admin = user && isAdmin(user.role);
 
@@ -169,7 +171,7 @@ export function AvisoDetailPage() {
 
             {aviso.comentarios?.map((c) => (
               <div key={c.id} className="flex items-start gap-2.5 mb-3">
-                <Avatar nome={c.nomeUsuario} size="xs" />
+                <Avatar nome={c.nomeUsuario} fotoUrl={c.fotoUrl} size="xs" />
                 <div className="flex-1 bg-white rounded-2xl px-3 py-2.5 shadow-card border border-slate-100">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold text-slate-700">
@@ -205,7 +207,7 @@ export function AvisoDetailPage() {
 
             {/* Input de comentário */}
             <div className="flex items-end gap-2 mt-2">
-              <Avatar nome={user?.nome ?? ''} size="xs" />
+              <Avatar nome={user?.nome ?? ''} fotoUrl={perfil?.fotoUrl} size="xs" />
               <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
                 {previewUrl && (
                   <div className="relative p-2 pb-0">

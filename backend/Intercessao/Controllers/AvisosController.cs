@@ -287,6 +287,7 @@ public class AvisosController(
         ApelidoUsuario = c.Usuario?.Apelido,
         Texto = c.Texto,
         UrlMidia = c.UrlMidia,
+        FotoUrl = c.Usuario?.FotoUrl,
         CriadoEm = c.CriadoEm
     };
 }

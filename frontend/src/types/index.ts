@@ -97,6 +97,7 @@ export interface Comentario {
   apelidoUsuario: string | null;
   texto: string;
   urlMidia?: string | null;
+  fotoUrl: string | null;
   criadoEm: string;
 }
 
