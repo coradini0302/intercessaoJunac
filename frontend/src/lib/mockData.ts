@@ -74,10 +74,10 @@ export const mockAvisos: Aviso[] = [
     atualizadoEm: null,
     totalComentarios: 4,
     comentarios: [
-      { id: 1, usuarioId: 'user-2', nomeUsuario: 'Luana Ferreira', apelidoUsuario: 'Luana', texto: 'Confirmada! 🙏', criadoEm: '2026-05-08T15:00:00' },
-      { id: 2, usuarioId: 'user-3', nomeUsuario: 'Mavi Santos', apelidoUsuario: 'Mavi', texto: 'Estarei lá com certeza!', criadoEm: '2026-05-08T15:30:00' },
-      { id: 3, usuarioId: 'user-5', nomeUsuario: 'Lara Oliveira', apelidoUsuario: 'Lara', texto: 'Tá na agenda ✅', criadoEm: '2026-05-08T16:00:00' },
-      { id: 4, usuarioId: 'user-6', nomeUsuario: 'Amanda Costa', apelidoUsuario: 'Amanda', texto: 'Amém! Até sábado 🕊️', criadoEm: '2026-05-08T17:00:00' },
+      { id: 1, usuarioId: 'user-2', nomeUsuario: 'Luana Ferreira', apelidoUsuario: 'Luana', fotoUrl: null, texto: 'Confirmada! 🙏', criadoEm: '2026-05-08T15:00:00' },
+      { id: 2, usuarioId: 'user-3', nomeUsuario: 'Mavi Santos', apelidoUsuario: 'Mavi', fotoUrl: null, texto: 'Estarei lá com certeza!', criadoEm: '2026-05-08T15:30:00' },
+      { id: 3, usuarioId: 'user-5', nomeUsuario: 'Lara Oliveira', apelidoUsuario: 'Lara', fotoUrl: null, texto: 'Tá na agenda ✅', criadoEm: '2026-05-08T16:00:00' },
+      { id: 4, usuarioId: 'user-6', nomeUsuario: 'Amanda Costa', apelidoUsuario: 'Amanda', fotoUrl: null, texto: 'Amém! Até sábado 🕊️', criadoEm: '2026-05-08T17:00:00' },
     ],
   },
   {
@@ -95,8 +95,8 @@ export const mockAvisos: Aviso[] = [
     atualizadoEm: null,
     totalComentarios: 2,
     comentarios: [
-      { id: 5, usuarioId: 'user-4', nomeUsuario: 'João Pedro Silva', apelidoUsuario: 'João', texto: 'Que bom! Vou participar 🙌', criadoEm: '2026-05-07T11:00:00' },
-      { id: 6, usuarioId: 'user-7', nomeUsuario: 'Maria Clara Lima', apelidoUsuario: 'Maria Clara', texto: 'Participarei do jejum e da oração online!', criadoEm: '2026-05-07T12:00:00' },
+      { id: 5, usuarioId: 'user-4', nomeUsuario: 'João Pedro Silva', apelidoUsuario: 'João', fotoUrl: null, texto: 'Que bom! Vou participar 🙌', criadoEm: '2026-05-07T11:00:00' },
+      { id: 6, usuarioId: 'user-7', nomeUsuario: 'Maria Clara Lima', apelidoUsuario: 'Maria Clara', fotoUrl: null, texto: 'Participarei do jejum e da oração online!', criadoEm: '2026-05-07T12:00:00' },
     ],
   },
   {
@@ -130,7 +130,7 @@ export const mockAvisos: Aviso[] = [
     atualizadoEm: null,
     totalComentarios: 1,
     comentarios: [
-      { id: 7, usuarioId: 'user-8', nomeUsuario: 'Alicia Rodrigues', apelidoUsuario: 'Alicia', texto: 'Vi meu nome! Obrigada 🙏', criadoEm: '2026-05-04T19:00:00' },
+      { id: 7, usuarioId: 'user-8', nomeUsuario: 'Alicia Rodrigues', apelidoUsuario: 'Alicia', fotoUrl: null, texto: 'Vi meu nome! Obrigada 🙏', criadoEm: '2026-05-04T19:00:00' },
     ],
   },
   {
@@ -148,9 +148,9 @@ export const mockAvisos: Aviso[] = [
     atualizadoEm: null,
     totalComentarios: 3,
     comentarios: [
-      { id: 8, usuarioId: 'user-9', nomeUsuario: 'Loss Nascimento', apelidoUsuario: 'Loss', texto: 'Que palavra poderosa! 🔥', criadoEm: '2026-05-03T09:00:00' },
-      { id: 9, usuarioId: 'user-10', nomeUsuario: 'Kadu Mendes', apelidoUsuario: 'Kadu', texto: 'Amém! Somos sentinelas!', criadoEm: '2026-05-03T10:00:00' },
-      { id: 10, usuarioId: 'user-2', nomeUsuario: 'Luana Ferreira', apelidoUsuario: 'Luana', texto: 'Palavra no coração. Obrigada! 🕊️', criadoEm: '2026-05-03T11:00:00' },
+      { id: 8, usuarioId: 'user-9', nomeUsuario: 'Loss Nascimento', apelidoUsuario: 'Loss', fotoUrl: null, texto: 'Que palavra poderosa! 🔥', criadoEm: '2026-05-03T09:00:00' },
+      { id: 9, usuarioId: 'user-10', nomeUsuario: 'Kadu Mendes', apelidoUsuario: 'Kadu', fotoUrl: null, texto: 'Amém! Somos sentinelas!', criadoEm: '2026-05-03T10:00:00' },
+      { id: 10, usuarioId: 'user-2', nomeUsuario: 'Luana Ferreira', apelidoUsuario: 'Luana', fotoUrl: null, texto: 'Palavra no coração. Obrigada! 🕊️', criadoEm: '2026-05-03T11:00:00' },
     ],
   },
 ];

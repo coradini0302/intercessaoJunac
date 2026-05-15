@@ -2,8 +2,9 @@ import { useParams } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { MessageCircle, Send, Trash2, Edit2, Image, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { usePerfil } from '../hooks/useUsuarios';
+import { usePerfil, useEquipe } from '../hooks/useUsuarios';
 import { useAviso, useComentarAviso, useDeletarComentario, useEditarAviso, useUploadMidiaAviso, useUploadComentarioMidia } from '../hooks/useAvisos';
+import { MentionInput, renderMentions } from '../components/ui/MentionInput';
 import { TopBar } from '../components/layout/TopBar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -20,6 +21,7 @@ export function AvisoDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { data: perfil } = usePerfil();
+  const { data: membros = [] } = useEquipe();
   const avisoId = Number(id);
   const admin = user && isAdmin(user.role);
 
@@ -192,7 +194,7 @@ export function AvisoDetailPage() {
                     </div>
                   </div>
                   {c.texto !== '.' && (
-                    <p className="text-sm text-slate-600 mt-0.5">{c.texto}</p>
+                    <p className="text-sm text-slate-600 mt-0.5">{renderMentions(c.texto, membros)}</p>
                   )}
                   {c.urlMidia && (
                     <img
@@ -208,7 +210,7 @@ export function AvisoDetailPage() {
             {/* Input de comentário */}
             <div className="flex items-end gap-2 mt-2">
               <Avatar nome={user?.nome ?? ''} fotoUrl={perfil?.fotoUrl} size="xs" />
-              <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
+              <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-card border border-slate-100">
                 {previewUrl && (
                   <div className="relative p-2 pb-0">
                     <img
@@ -225,14 +227,14 @@ export function AvisoDetailPage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 px-3 py-2">
-                  <input
+                  <MentionInput
                     value={texto}
-                    onChange={(e) => setTexto(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleComment()}
+                    onChange={setTexto}
+                    onEnter={handleComment}
                     onPaste={handlePaste}
+                    membros={membros}
                     placeholder="Escreva um comentário..."
                     maxLength={500}
-                    className="flex-1 text-sm outline-none text-slate-700 placeholder:text-slate-400 bg-transparent"
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
