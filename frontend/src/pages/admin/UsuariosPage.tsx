@@ -123,7 +123,7 @@ export function UsuariosPage() {
         {usuarios?.map((u) => (
           <Card key={u.id}>
             <div className="flex items-center gap-3">
-              <Avatar nome={u.nome} size="md" />
+              <Avatar nome={u.nome} fotoUrl={u.fotoUrl} size="md" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-semibold text-slate-800">{displayName(u.nome, u.apelido)}</p>

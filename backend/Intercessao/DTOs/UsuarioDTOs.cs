@@ -30,6 +30,7 @@ public class UsuarioResponse
     public bool Ativo { get; set; }
     public bool TrocouSenha { get; set; }
     public DateTime CriadoEm { get; set; }
+    public string? FotoUrl { get; set; }
 }
 
 public class ResetarSenhaResponse

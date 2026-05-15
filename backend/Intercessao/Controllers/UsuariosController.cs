@@ -232,7 +232,8 @@ public class UsuariosController(
         Role = role,
         Ativo = user.Ativo,
         TrocouSenha = user.TrocouSenha,
-        CriadoEm = user.CriadoEm
+        CriadoEm = user.CriadoEm,
+        FotoUrl = user.FotoUrl
     };
 
     private static bool RoleValida(string role) =>

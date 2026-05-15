@@ -48,6 +48,7 @@ export interface UsuarioAdmin {
   ativo: boolean;
   trocouSenha: boolean;
   criadoEm: string;
+  fotoUrl: string | null;
 }
 
 export interface Encontro {
