@@ -75,7 +75,10 @@ export function useCriarUsuario() {
       const { data } = await api.post('/api/usuarios', body);
       return data as { usuario: UsuarioAdmin; senhaTemporaria: string; mensagem: string };
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['usuarios'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['usuarios'] });
+      qc.invalidateQueries({ queryKey: ['equipe'] });
+    },
   });
 }
 
@@ -85,7 +88,10 @@ export function useEditarUsuario() {
     mutationFn: async ({ id, ...body }: { id: string; nome: string; apelido?: string | null; email?: string | null; role?: string | null }) => {
       await api.put(`/api/usuarios/${id}`, body);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['usuarios'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['usuarios'] });
+      qc.invalidateQueries({ queryKey: ['equipe'] });
+    },
   });
 }
 
@@ -95,7 +101,10 @@ export function useAtivarUsuario() {
     mutationFn: async (id: string) => {
       await api.post(`/api/usuarios/${id}/ativar`);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['usuarios'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['usuarios'] });
+      qc.invalidateQueries({ queryKey: ['equipe'] });
+    },
   });
 }
 
@@ -105,7 +114,10 @@ export function useDesativarUsuario() {
     mutationFn: async (id: string) => {
       await api.post(`/api/usuarios/${id}/desativar`);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['usuarios'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['usuarios'] });
+      qc.invalidateQueries({ queryKey: ['equipe'] });
+    },
   });
 }
 

@@ -28,7 +28,8 @@ interface ResumoForm {
 const FORM_VAZIO: ResumoForm = { titulo: '', conteudo: '', dataReuniao: '' };
 
 function formatDataReuniao(iso: string): { dia: string; mes: string; completa: string } {
-  const d = parseISO(iso);
+  // Usa apenas a parte da data (YYYY-MM-DD) para evitar deslocamento por fuso horário
+  const d = parseISO(iso.slice(0, 10));
   return {
     dia: format(d, 'dd'),
     mes: format(d, 'MMM', { locale: ptBR }),
@@ -62,7 +63,7 @@ export function ReuniaoResumosPage() {
     setForm({
       titulo: r.titulo,
       conteudo: r.conteudo,
-      dataReuniao: format(parseISO(r.dataReuniao), 'yyyy-MM-dd'),
+      dataReuniao: r.dataReuniao.slice(0, 10),
     });
     setSelected(null);
     setFormOpen(true);
