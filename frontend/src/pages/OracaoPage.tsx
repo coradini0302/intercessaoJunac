@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Archive, BookOpen, ChevronDown, ChevronRight, Cloc
 import { format, parseISO, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../context/AuthContext';
+import { useEquipe } from '../hooks/useUsuarios';
 import { useEncontroAtivo } from '../hooks/useEncontro';
 import {
   useIntercedidos, useAdicionarIntercedido, useEditarIntercedido,
@@ -14,7 +15,8 @@ import { TopBar } from '../components/layout/TopBar';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
-import { Input, Textarea } from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
+import { MentionTextarea } from '../components/ui/MentionTextarea';
 import { PageSpinner } from '../components/ui/Spinner';
 import { isAdmin } from '../lib/utils';
 import { extractErrorMessage } from '../lib/api';
@@ -213,6 +215,7 @@ function ModalEvento({
   form: EventoForm; setForm: (f: EventoForm) => void;
   onSalvar: () => void; loading: boolean; showSemana?: boolean; showDateTime?: boolean;
 }) {
+  const { data: membros = [] } = useEquipe();
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}
       footer={<Button fullWidth loading={loading} onClick={onSalvar}>Salvar</Button>}
@@ -238,12 +241,13 @@ function ModalEvento({
           value={form.titulo}
           onChange={(e) => setForm({ ...form, titulo: e.target.value })}
         />
-        <Textarea
+        <MentionTextarea
           label="Descrição"
           placeholder="Detalhes do compromisso (opcional)..."
           rows={3}
           value={form.descricao}
-          onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+          onChange={(v) => setForm({ ...form, descricao: v })}
+          membros={membros}
         />
         {showDateTime && (
           <>

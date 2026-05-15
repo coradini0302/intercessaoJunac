@@ -3,6 +3,7 @@ import { Plus, ClipboardList } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../context/AuthContext';
+import { useEquipe } from '../hooks/useUsuarios';
 import {
   useReuniaoResumos,
   useCriarReuniaoResumo,
@@ -12,7 +13,8 @@ import {
 import { TopBar } from '../components/layout/TopBar';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
-import { Input, Textarea } from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
+import { MentionTextarea } from '../components/ui/MentionTextarea';
 import { PageSpinner } from '../components/ui/Spinner';
 import { isAdmin } from '../lib/utils';
 import { extractErrorMessage } from '../lib/api';
@@ -40,6 +42,7 @@ function formatDataReuniao(iso: string): { dia: string; mes: string; completa: s
 export function ReuniaoResumosPage() {
   const { user } = useAuth();
   const admin = user && isAdmin(user.role);
+  const { data: membros = [] } = useEquipe();
   const { data: resumos = [], isLoading } = useReuniaoResumos();
 
   const [selected, setSelected] = useState<ReuniaoResumo | null>(null);
@@ -217,12 +220,13 @@ export function ReuniaoResumosPage() {
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-primary-400"
             />
           </div>
-          <Textarea
+          <MentionTextarea
             label="Resumo *"
             placeholder="Escreva aqui o resumo da reunião..."
             rows={6}
             value={form.conteudo}
-            onChange={(e) => setForm({ ...form, conteudo: e.target.value })}
+            onChange={(v) => setForm({ ...form, conteudo: v })}
+            membros={membros}
           />
         </div>
       </Modal>

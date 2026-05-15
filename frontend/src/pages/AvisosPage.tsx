@@ -4,12 +4,14 @@ import { Megaphone, Plus, MessageCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useEncontroAtivo } from '../hooks/useEncontro';
 import { useAvisos, useCriarAviso } from '../hooks/useAvisos';
+import { useEquipe } from '../hooks/useUsuarios';
+import { MentionTextarea } from '../components/ui/MentionTextarea';
 import { TopBar } from '../components/layout/TopBar';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
-import { Input, Textarea } from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
 import { PageSpinner } from '../components/ui/Spinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { formatRelativeDate, isAdmin } from '../lib/utils';
@@ -34,9 +36,11 @@ export function AvisosPage() {
   const { data: avisos, isLoading } = useAvisos(encontro?.id);
   const criar = useCriarAviso();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<AvisoForm>({
+  const { data: membros = [] } = useEquipe();
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<AvisoForm>({
     defaultValues: { permiteComentarios: true },
   });
+  const conteudo = watch('conteudo') ?? '';
 
   const onSubmit = async (values: AvisoForm) => {
     if (!encontro) return;
@@ -130,12 +134,13 @@ export function AvisosPage() {
             error={errors.titulo?.message}
             {...register('titulo', { required: 'Informe o título' })}
           />
-          <Textarea
-            label="Conteúdo"
+          <MentionTextarea
+            label="Conteúdo *"
             placeholder="Escreva o aviso..."
             rows={5}
-            error={errors.conteudo?.message}
-            {...register('conteudo', { required: 'Informe o conteúdo' })}
+            value={conteudo}
+            onChange={(v) => setValue('conteudo', v, { shouldValidate: true })}
+            membros={membros}
           />
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" {...register('permiteComentarios')} className="w-4 h-4 rounded accent-primary-500" />

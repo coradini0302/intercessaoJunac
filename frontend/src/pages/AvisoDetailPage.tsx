@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { usePerfil, useEquipe } from '../hooks/useUsuarios';
 import { useAviso, useComentarAviso, useDeletarComentario, useEditarAviso, useUploadMidiaAviso, useUploadComentarioMidia } from '../hooks/useAvisos';
 import { MentionInput, renderMentions } from '../components/ui/MentionInput';
+import { MentionTextarea } from '../components/ui/MentionTextarea';
 import { TopBar } from '../components/layout/TopBar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -14,7 +15,7 @@ import { buildImageUrl, extractErrorMessage } from '../lib/api';
 import { displayName, formatRelativeDate, isAdmin } from '../lib/utils';
 import { toast } from 'sonner';
 import { Modal } from '../components/ui/Modal';
-import { Input, Textarea } from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
 import { useForm } from 'react-hook-form';
 
 export function AvisoDetailPage() {
@@ -40,9 +41,10 @@ export function AvisoDetailPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, watch, setValue } = useForm({
     values: aviso ? { titulo: aviso.titulo, conteudo: aviso.conteudo, permiteComentarios: aviso.permiteComentarios, ativo: aviso.ativo } : undefined,
   });
+  const conteudoEdit = watch('conteudo') ?? '';
 
   const setImagem = (file: File | null) => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -277,7 +279,13 @@ export function AvisoDetailPage() {
         >
           <form className="flex flex-col gap-4">
             <Input label="Título" {...register('titulo')} />
-            <Textarea label="Conteúdo" rows={5} {...register('conteudo')} />
+            <MentionTextarea
+              label="Conteúdo"
+              rows={5}
+              value={conteudoEdit}
+              onChange={(v) => setValue('conteudo', v)}
+              membros={membros}
+            />
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" {...register('permiteComentarios')} className="w-4 h-4 accent-primary-500" />
               <span className="text-sm text-slate-700">Permitir comentários</span>
