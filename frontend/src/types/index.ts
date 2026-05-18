@@ -162,6 +162,10 @@ export interface CompromissoOracao {
 
 export interface CompromissoIntercedido {
   id: number;
+  usuarioId: string;
+  nomeUsuario: string;
+  apelidoUsuario: string | null;
+  fotoUrl: string | null;
   titulo: string;
   conteudo: string | null;
   ativo: boolean;

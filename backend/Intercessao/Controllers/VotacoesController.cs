@@ -153,19 +153,24 @@ public class VotacoesController(AppDbContext db, IAuditoriaService auditoria) : 
         if (votacao.DataFim.HasValue && votacao.DataFim.Value < DateTime.UtcNow)
             return BadRequest(new { erro = "O prazo desta votação expirou." });
 
-        if (votacao.Votos.Any(v => v.UsuarioId == UserId))
-            return Conflict(new { erro = "Você já votou nesta votação." });
-
         if (!votacao.Opcoes.Any(o => o.Id == request.OpcaoId))
             return BadRequest(new { erro = "Opção inválida." });
 
-        db.VotacaoVotos.Add(new VotacaoVoto
+        var votoExistente = votacao.Votos.FirstOrDefault(v => v.UsuarioId == UserId);
+        if (votoExistente is not null)
         {
-            VotacaoId = id,
-            OpcaoId = request.OpcaoId,
-            UsuarioId = UserId,
-            CriadoEm = DateTime.UtcNow
-        });
+            votoExistente.OpcaoId = request.OpcaoId;
+        }
+        else
+        {
+            db.VotacaoVotos.Add(new VotacaoVoto
+            {
+                VotacaoId = id,
+                OpcaoId = request.OpcaoId,
+                UsuarioId = UserId,
+                CriadoEm = DateTime.UtcNow
+            });
+        }
 
         await db.SaveChangesAsync();
 

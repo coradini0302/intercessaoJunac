@@ -30,7 +30,7 @@ export function VotacaoDetailPage() {
     setVoting(true);
     try {
       await votar.mutateAsync({ votacaoId, opcaoId });
-      toast.success('Voto registrado!');
+      toast.success(votacao?.jaVotei ? 'Voto atualizado!' : 'Voto registrado!');
     } catch (err) {
       toast.error(extractErrorMessage(err));
     } finally {
@@ -51,7 +51,8 @@ export function VotacaoDetailPage() {
   if (!votacao) return null;
 
   const showResults = votacao.jaVotei || !votacao.ativa;
-  const canVote = votacao.ativa && !votacao.jaVotei;
+  const canVote = votacao.ativa;
+  const mudandoVoto = canVote && votacao.jaVotei;
 
   return (
     <div className="flex flex-col">
@@ -65,7 +66,7 @@ export function VotacaoDetailPage() {
             ) : (
               <Badge label="Encerrada" variant="gray" size="md" />
             )}
-            {votacao.jaVotei && <Badge label="Seu voto registrado" variant="green" size="md" />}
+            {votacao.jaVotei && <Badge label={mudandoVoto ? 'Voto registrado · pode mudar' : 'Voto registrado'} variant="green" size="md" />}
           </div>
 
           <h1 className="text-base font-bold text-slate-800 mb-1 leading-snug">
@@ -140,7 +141,7 @@ export function VotacaoDetailPage() {
             loading={voting}
             onClick={handleVotar}
           >
-            Confirmar voto
+            {mudandoVoto ? 'Mudar voto' : 'Confirmar voto'}
           </Button>
         )}
 

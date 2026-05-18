@@ -12,13 +12,14 @@ import {
   useEditarCompromissoEquipe, useDeletarCompromissoEquipe,
 } from '../hooks/useCompromissos';
 import { TopBar } from '../components/layout/TopBar';
+import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { MentionTextarea } from '../components/ui/MentionTextarea';
 import { PageSpinner } from '../components/ui/Spinner';
-import { isAdmin } from '../lib/utils';
+import { displayName, isAdmin } from '../lib/utils';
 import { extractErrorMessage } from '../lib/api';
 import { toast } from 'sonner';
 import type { CompromissoIntercedido, CompromissoEquipe } from '../types';
@@ -121,7 +122,7 @@ function EventoCard({
 }: {
   titulo: string; descricao: string | null; dataHora: string | null; diaInteiro: boolean;
   passado: boolean; arquivado?: boolean;
-  onEdit?: () => void; onDelete: () => void; onArchivar?: () => void; showActions: boolean;
+  onEdit?: () => void; onDelete?: () => void; onArchivar?: () => void; showActions: boolean;
 }) {
   return (
     <div className={`bg-white rounded-xl border p-3.5 transition-opacity ${passado ? 'opacity-60' : ''} ${arquivado ? 'opacity-50' : ''} ${passado ? 'border-slate-100' : 'border-slate-100'}`}>
@@ -296,11 +297,16 @@ export function OracaoPage() {
   const { user } = useAuth();
   const admin = user && isAdmin(user.role);
   const { data: encontro } = useEncontroAtivo();
+  const { data: equipe = [] } = useEquipe();
   const semanaAtual = getSemanaAtual();
 
   const [aba, setAba] = useState<'intercessao' | 'equipe'>('intercessao');
   const [openWeeks, setOpenWeeks] = useState<Set<number>>(new Set([semanaAtual]));
   const [mostraArquivados, setMostraArquivados] = useState(false);
+  const [viewingUserId, setViewingUserId] = useState<string>(user?.userId ?? '');
+
+  const viewingOwn = viewingUserId === user?.userId;
+  const viewingMember = equipe.find(m => m.id === viewingUserId);
 
   // Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -328,17 +334,18 @@ export function OracaoPage() {
     });
   };
 
-  // Agrupa pessoais por semana
+  // Agrupa pessoais por semana (filtrando pelo usuário selecionado)
   const intercedidosPorSemana = useMemo(() => {
     const map = new Map<number, CompromissoIntercedido[]>();
     for (const c of meusIntercedidos ?? []) {
+      if (c.usuarioId !== viewingUserId) continue;
       if (!mostraArquivados && !c.ativo) continue;
       const sem = c.numeroSemana > 0 ? c.numeroSemana : semanaAtual;
       if (!map.has(sem)) map.set(sem, []);
       map.get(sem)!.push(c);
     }
     return map;
-  }, [meusIntercedidos, mostraArquivados, semanaAtual]);
+  }, [meusIntercedidos, mostraArquivados, semanaAtual, viewingUserId]);
 
   // Agrupa equipe por semana
   const equipePorSemana = useMemo(() => {
@@ -460,7 +467,36 @@ export function OracaoPage() {
       {/* ── Aba: Compromissos Intercessão ── */}
       {aba === 'intercessao' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
-          <div className="flex items-center justify-between mb-1">
+
+          {/* Person picker */}
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+            {[...equipe].sort((a, b) => (a.id === user?.userId ? -1 : b.id === user?.userId ? 1 : 0)).map((m) => {
+              const isMe = m.id === user?.userId;
+              const selected = m.id === viewingUserId;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setViewingUserId(m.id)}
+                  className="flex flex-col items-center gap-1 shrink-0"
+                >
+                  <div className={`rounded-full p-0.5 transition-all ${selected ? 'ring-2 ring-primary-500 ring-offset-1' : ''}`}>
+                    <Avatar nome={m.nome} fotoUrl={m.fotoUrl} size="sm" />
+                  </div>
+                  <span className={`text-[10px] font-medium max-w-[48px] truncate ${selected ? 'text-primary-600' : 'text-slate-500'}`}>
+                    {isMe ? 'Eu' : displayName(m.nome, m.apelido)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {!viewingOwn && viewingMember && (
+            <p className="text-xs text-slate-400 text-center -mt-1">
+              Visualizando compromissos de <span className="font-medium text-slate-600">{displayName(viewingMember.nome, viewingMember.apelido)}</span>
+            </p>
+          )}
+
+          <div className="flex items-center justify-between">
             <button
               onClick={() => setMostraArquivados(!mostraArquivados)}
               className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
@@ -477,17 +513,18 @@ export function OracaoPage() {
           {!loadingMeus && semanas.map((sem) => {
             const items = intercedidosPorSemana.get(sem) ?? [];
             const open = openWeeks.has(sem);
+            const canAdd = !!admin && viewingOwn;
             return (
               <SemanaSection
                 key={sem} semana={sem} semanaAtual={semanaAtual}
                 open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, false)} canAdd={!!admin}
+                onAdd={() => openModalAdd(sem, false)} canAdd={canAdd}
               >
                 {items.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <BookOpen size={18} className="text-slate-300" />
                     <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
-                    {admin && (
+                    {canAdd && (
                       <button onClick={() => openModalAdd(sem, false)} className="text-xs text-primary-600 hover:underline">
                         + Adicionar
                       </button>
@@ -503,10 +540,10 @@ export function OracaoPage() {
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
                     arquivado={!c.ativo}
-                    showActions={!!admin}
-                    onEdit={admin ? () => openModalEdit(c, false) : undefined}
-                    onArchivar={admin ? () => handleArquivar(c.id, c.ativo) : undefined}
-                    onDelete={() => handleDeletarMeus(c.id)}
+                    showActions={!!admin && viewingOwn}
+                    onEdit={admin && viewingOwn ? () => openModalEdit(c, false) : undefined}
+                    onArchivar={admin && viewingOwn ? () => handleArquivar(c.id, c.ativo) : undefined}
+                    onDelete={admin && viewingOwn ? () => handleDeletarMeus(c.id) : undefined}
                   />
                 ))}
               </SemanaSection>
