@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Droplets, Heart, Flame, Share2, Settings, Trash2, Edit2, Send, X, Check } from 'lucide-react';
+import { Droplets, Heart, Flame, Share2, Settings, Trash2, Edit2, Send, Check } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../context/AuthContext';
