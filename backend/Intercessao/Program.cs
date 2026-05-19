@@ -144,6 +144,10 @@ static async Task ApplySchemaPatches(AppDbContext db)
             """CREATE TABLE IF NOT EXISTS "ReuniaoResumos" ("Id" SERIAL PRIMARY KEY,"Titulo" VARCHAR(200) NOT NULL,"Conteudo" TEXT NOT NULL,"DataReuniao" TIMESTAMPTZ NOT NULL,"CriadoPorId" TEXT NOT NULL,"CriadoEm" TIMESTAMPTZ NOT NULL,"AtualizadoEm" TIMESTAMPTZ)""",
             """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "FotoDados" BYTEA""",
             """ALTER TABLE "AspNetUsers" ADD COLUMN IF NOT EXISTS "FotoMimeType" VARCHAR(100)""",
+            """CREATE TABLE IF NOT EXISTS "DinamicasMembros" ("Tipo" INTEGER NOT NULL,"UsuarioId" TEXT NOT NULL,PRIMARY KEY ("Tipo","UsuarioId"))""",
+            """CREATE TABLE IF NOT EXISTS "DinamicasPosts" ("Id" SERIAL PRIMARY KEY,"Tipo" INTEGER NOT NULL,"Titulo" VARCHAR(300),"Conteudo" TEXT NOT NULL,"CriadoPorId" TEXT NOT NULL,"CriadoEm" TIMESTAMPTZ NOT NULL,"AtualizadoEm" TIMESTAMPTZ)""",
+            """CREATE TABLE IF NOT EXISTS "AltoMarIdeias" ("Id" SERIAL PRIMARY KEY,"Titulo" VARCHAR(300) NOT NULL,"Conteudo" TEXT NOT NULL,"CriadoPorId" TEXT NOT NULL,"CriadoEm" TIMESTAMPTZ NOT NULL,"AtualizadoEm" TIMESTAMPTZ)""",
+            """CREATE TABLE IF NOT EXISTS "AltoMarComentarios" ("Id" SERIAL PRIMARY KEY,"IdeiaId" INTEGER NOT NULL,"Texto" TEXT NOT NULL,"CriadoPorId" TEXT NOT NULL,"CriadoEm" TIMESTAMPTZ NOT NULL)""",
           ]
         : [
             "ALTER TABLE AspNetUsers ADD COLUMN EquipeIntercessao TEXT",
@@ -155,6 +159,10 @@ static async Task ApplySchemaPatches(AppDbContext db)
             "CREATE TABLE IF NOT EXISTS ReuniaoResumos (Id INTEGER PRIMARY KEY AUTOINCREMENT,Titulo TEXT NOT NULL,Conteudo TEXT NOT NULL,DataReuniao TEXT NOT NULL,CriadoPorId TEXT NOT NULL,CriadoEm TEXT NOT NULL,AtualizadoEm TEXT)",
             "ALTER TABLE AspNetUsers ADD COLUMN FotoDados BLOB",
             "ALTER TABLE AspNetUsers ADD COLUMN FotoMimeType TEXT",
+            "CREATE TABLE IF NOT EXISTS DinamicasMembros (Tipo INTEGER NOT NULL,UsuarioId TEXT NOT NULL,PRIMARY KEY (Tipo,UsuarioId))",
+            "CREATE TABLE IF NOT EXISTS DinamicasPosts (Id INTEGER PRIMARY KEY AUTOINCREMENT,Tipo INTEGER NOT NULL,Titulo TEXT,Conteudo TEXT NOT NULL,CriadoPorId TEXT NOT NULL,CriadoEm TEXT NOT NULL,AtualizadoEm TEXT)",
+            "CREATE TABLE IF NOT EXISTS AltoMarIdeias (Id INTEGER PRIMARY KEY AUTOINCREMENT,Titulo TEXT NOT NULL,Conteudo TEXT NOT NULL,CriadoPorId TEXT NOT NULL,CriadoEm TEXT NOT NULL,AtualizadoEm TEXT)",
+            "CREATE TABLE IF NOT EXISTS AltoMarComentarios (Id INTEGER PRIMARY KEY AUTOINCREMENT,IdeiaId INTEGER NOT NULL,Texto TEXT NOT NULL,CriadoPorId TEXT NOT NULL,CriadoEm TEXT NOT NULL)",
           ];
 
     foreach (var sql in patches)

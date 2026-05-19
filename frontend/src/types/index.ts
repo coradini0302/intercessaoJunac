@@ -242,6 +242,55 @@ export interface ReuniaoResumo {
   atualizadoEm: string | null;
 }
 
+export type TipoDinamica = 0 | 1 | 2 | 3;
+
+export interface DinamicaMembro {
+  usuarioId: string;
+  nome: string;
+  apelido: string | null;
+  fotoUrl: string | null;
+}
+
+export interface DinamicaMembrosTipo {
+  tipo: TipoDinamica;
+  nomeDinamica: string;
+  membros: DinamicaMembro[];
+}
+
+export interface DinamicaPost {
+  id: number;
+  tipo: TipoDinamica;
+  nomeDinamica: string;
+  titulo: string | null;
+  conteudo: string;
+  criadoPorId: string;
+  nomeCriador: string;
+  fotoCriador: string | null;
+  criadoEm: string;
+  atualizadoEm: string | null;
+}
+
+export interface AltoMarComentario {
+  id: number;
+  texto: string;
+  criadoPorId: string;
+  nomeCriador: string;
+  fotoCriador: string | null;
+  criadoEm: string;
+}
+
+export interface AltoMarIdeia {
+  id: number;
+  titulo: string;
+  conteudo: string;
+  criadoPorId: string;
+  nomeCriador: string;
+  fotoCriador: string | null;
+  criadoEm: string;
+  atualizadoEm: string | null;
+  comentarios: AltoMarComentario[];
+}
+
 export interface ApiError {
   erro?: string;
   erros?: string[];
