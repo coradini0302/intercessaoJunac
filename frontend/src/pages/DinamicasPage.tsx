@@ -132,9 +132,9 @@ function GerenciarMembrosModal({
 }
 
 function DinamicaTab({
-  tipo, userId, admin,
+  tipo, userId, admin, isMembro,
 }: {
-  tipo: TipoDinamica; userId: string; admin: boolean;
+  tipo: TipoDinamica; userId: string; admin: boolean; isMembro: boolean;
 }) {
   const config = DINAMICAS.find(d => d.tipo === tipo)!;
   const { data: posts = [], isLoading } = useDinamicaPosts(tipo);
@@ -194,6 +194,12 @@ function DinamicaTab({
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4 max-w-2xl w-full">
+      {!isMembro && !admin && (
+        <div className="bg-slate-50 rounded-xl px-3 py-2 text-xs text-slate-500 text-center">
+          Você não faz parte desta dinâmica — somente leitura.
+        </div>
+      )}
+
       {admin && (
         <div className="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2">
           <span className="text-xs text-slate-500">
@@ -229,8 +235,8 @@ function DinamicaTab({
         />
       ))}
 
-      {/* Nova mensagem */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-3 mt-1">
+      {/* Nova mensagem — só para membros e admin */}
+      {(isMembro || admin) && <div className="bg-white rounded-2xl border border-slate-200 p-3 mt-1">
         <input
           type="text"
           placeholder="Título (opcional)"
@@ -254,7 +260,7 @@ function DinamicaTab({
             <Send size={13} /> Publicar
           </button>
         </div>
-      </div>
+      </div>}
 
       {editingPost && (
         <Modal
@@ -302,10 +308,8 @@ export function DinamicasPage() {
   const admin = user && isAdmin(user.role);
   const { data: minhasDinamicas = [], isLoading } = useMinhasDinamicas();
 
-  const dinamicasVisiveis = DINAMICAS.filter(d => admin || minhasDinamicas.includes(d.tipo));
   const [abaAtiva, setAbaAtiva] = useState<TipoDinamica | null>(null);
-
-  const abaEfetiva = abaAtiva ?? (dinamicasVisiveis[0]?.tipo ?? null);
+  const abaEfetiva = abaAtiva ?? DINAMICAS[0].tipo;
 
   if (isLoading) return (
     <div className="flex flex-col">
@@ -314,25 +318,13 @@ export function DinamicasPage() {
     </div>
   );
 
-  if (dinamicasVisiveis.length === 0) return (
-    <div className="flex flex-col">
-      <TopBar title="Dinâmicas" gradient />
-      <div className="flex flex-col items-center gap-3 py-20 px-4 text-center">
-        <Flame size={40} className="text-slate-200" />
-        <p className="text-slate-400 text-sm">Você ainda não está em nenhuma dinâmica.<br />Aguarde a coordenação.</p>
-      </div>
-    </div>
-  );
-
-  const configAtiva = DINAMICAS.find(d => d.tipo === abaEfetiva);
-
   return (
     <div className="flex flex-col">
       <TopBar title="Dinâmicas" gradient />
 
       {/* Tab bar */}
       <div className="flex bg-white border-b border-slate-100 sticky top-14 md:top-16 z-10 overflow-x-auto scrollbar-none">
-        {dinamicasVisiveis.map(({ tipo, nome, icon: Icon, color }) => (
+        {DINAMICAS.map(({ tipo, nome, icon: Icon, color }) => (
           <button
             key={tipo}
             onClick={() => setAbaAtiva(tipo)}
@@ -348,14 +340,13 @@ export function DinamicasPage() {
         ))}
       </div>
 
-      {configAtiva && abaEfetiva !== null && (
-        <DinamicaTab
-          key={abaEfetiva}
-          tipo={abaEfetiva}
-          userId={user?.userId ?? ''}
-          admin={!!admin}
-        />
-      )}
+      <DinamicaTab
+        key={abaEfetiva}
+        tipo={abaEfetiva}
+        userId={user?.userId ?? ''}
+        admin={!!admin}
+        isMembro={!!admin || minhasDinamicas.includes(abaEfetiva)}
+      />
     </div>
   );
 }

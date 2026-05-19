@@ -87,14 +87,12 @@ public class DinamicasController(AppDbContext db) : ControllerBase
             m.UsuarioId, m.Usuario?.Nome ?? string.Empty, m.Usuario?.Apelido, m.Usuario?.FotoUrl)));
     }
 
-    // GET /api/dinamicas/{tipo}/posts
+    // GET /api/dinamicas/{tipo}/posts — todos podem ler
     [HttpGet("{tipo:int}/posts")]
     public async Task<IActionResult> GetPosts(int tipo)
     {
         if (!Enum.IsDefined(typeof(TipoDinamica), tipo)) return BadRequest();
         var tipoDinamica = (TipoDinamica)tipo;
-
-        if (!await IsMembro(tipoDinamica)) return Forbid();
 
         var posts = await db.DinamicasPosts
             .Include(p => p.CriadoPor)
