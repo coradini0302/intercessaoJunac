@@ -50,8 +50,9 @@ export function VotacaoDetailPage() {
   if (isLoading) return <PageSpinner />;
   if (!votacao) return null;
 
-  const showResults = votacao.jaVotei || !votacao.ativa;
-  const canVote = votacao.ativa;
+  const prazoExpirado = !!votacao.dataFim && new Date(votacao.dataFim) < new Date();
+  const showResults = votacao.jaVotei || !votacao.ativa || prazoExpirado;
+  const canVote = votacao.ativa && !prazoExpirado;
   const mudandoVoto = canVote && votacao.jaVotei;
 
   return (
@@ -61,8 +62,10 @@ export function VotacaoDetailPage() {
       <div className="flex flex-col gap-4 px-4 py-4">
         <Card>
           <div className="flex items-start gap-2 mb-3">
-            {votacao.ativa ? (
+            {votacao.ativa && !prazoExpirado ? (
               <Badge label="Aberta" variant="purple" size="md" />
+            ) : prazoExpirado ? (
+              <Badge label="Prazo encerrado" variant="gray" size="md" />
             ) : (
               <Badge label="Encerrada" variant="gray" size="md" />
             )}
