@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Home, Megaphone, Calendar, BookOpen, MoreHorizontal,
-  CalendarDays, Vote, FileText, Users, User, Lock, Settings, ClipboardList, Flame, Lightbulb
+  CalendarDays, Vote, FileText, Users, User, Lock, Settings, ClipboardList, Flame, Lightbulb, GraduationCap
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -43,6 +43,7 @@ export function BottomNav() {
     { to: '/reuniao-resumos', icon: ClipboardList, label: 'Resumos' },
     { to: '/dinamicas', icon: Flame, label: 'Dinâmicas' },
     { to: '/alto-mar', icon: Lightbulb, label: 'Alto Mar' },
+    { to: '/formacoes', icon: GraduationCap, label: 'Formações' },
     { to: '/perfil', icon: User, label: 'Meu Perfil' },
     ...(admin ? [
       { to: '/admin/usuarios', icon: Settings, label: 'Usuários' },

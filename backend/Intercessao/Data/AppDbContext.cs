@@ -23,6 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<VotacaoOpcao> VotacaoOpcoes => Set<VotacaoOpcao>();
     public DbSet<VotacaoVoto> VotacaoVotos => Set<VotacaoVoto>();
     public DbSet<ReuniaoResumo> ReuniaoResumos => Set<ReuniaoResumo>();
+    public DbSet<Formacao> Formacoes => Set<Formacao>();
     public DbSet<DinamicaMembro> DinamicasMembros => Set<DinamicaMembro>();
     public DbSet<DinamicaPost> DinamicasPosts => Set<DinamicaPost>();
     public DbSet<AltoMarIdeia> AltoMarIdeias => Set<AltoMarIdeia>();
@@ -143,6 +144,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         });
 
         builder.Entity<ReuniaoResumo>(e =>
+        {
+            e.Property(x => x.Titulo).HasMaxLength(200).IsRequired();
+            e.HasOne(x => x.CriadoPor).WithMany().HasForeignKey(x => x.CriadoPorId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Formacao>(e =>
         {
             e.Property(x => x.Titulo).HasMaxLength(200).IsRequired();
             e.HasOne(x => x.CriadoPor).WithMany().HasForeignKey(x => x.CriadoPorId).OnDelete(DeleteBehavior.Restrict);

@@ -21,6 +21,7 @@ import { InfoRestritasPage } from './pages/admin/InfoRestritasPage';
 import { ReuniaoResumosPage } from './pages/ReuniaoResumosPage';
 import { DinamicasPage } from './pages/DinamicasPage';
 import { AltoMarPage } from './pages/AltoMarPage';
+import { FormacoesPage } from './pages/FormacoesPage';
 
 function RequireAuth() {
   const { isAuthenticated, user } = useAuth();
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
           { path: '/reuniao-resumos', element: <ReuniaoResumosPage /> },
           { path: '/dinamicas', element: <DinamicasPage /> },
           { path: '/alto-mar', element: <AltoMarPage /> },
+          { path: '/formacoes', element: <FormacoesPage /> },
           { path: '/perfil', element: <PerfilPage /> },
           {
             element: <RequireAdmin />,

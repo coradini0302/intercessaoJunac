@@ -242,6 +242,16 @@ export interface ReuniaoResumo {
   atualizadoEm: string | null;
 }
 
+export interface Formacao {
+  id: number;
+  titulo: string;
+  conteudo: string;
+  criadoPorId: string;
+  nomeCriador: string;
+  criadoEm: string;
+  atualizadoEm: string | null;
+}
+
 export type TipoDinamica = 0 | 1 | 2 | 3;
 
 export interface DinamicaMembro {
