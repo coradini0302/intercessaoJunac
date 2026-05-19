@@ -300,7 +300,7 @@ export function OracaoPage() {
   const { data: equipe = [] } = useEquipe();
   const semanaAtual = getSemanaAtual();
 
-  const [aba, setAba] = useState<'intercessao' | 'equipe'>('intercessao');
+  const [aba, setAba] = useState<'intercessao' | 'equipe'>('equipe');
   const [openWeeks, setOpenWeeks] = useState<Set<number>>(new Set([semanaAtual]));
   const [mostraArquivados, setMostraArquivados] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string>(user?.userId ?? '');
@@ -451,7 +451,7 @@ export function OracaoPage() {
 
       {/* Tab nav */}
       <div className="flex bg-white border-b border-slate-100 sticky top-14 md:top-16 z-10">
-        {(['intercessao', 'equipe'] as const).map((tab) => (
+        {(['equipe', 'intercessao'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setAba(tab)}
@@ -467,34 +467,6 @@ export function OracaoPage() {
       {/* ── Aba: Compromissos Intercessão ── */}
       {aba === 'intercessao' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
-
-          {/* Person picker */}
-          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
-            {[...equipe].sort((a, b) => (a.id === user?.userId ? -1 : b.id === user?.userId ? 1 : 0)).map((m) => {
-              const isMe = m.id === user?.userId;
-              const selected = m.id === viewingUserId;
-              return (
-                <button
-                  key={m.id}
-                  onClick={() => setViewingUserId(m.id)}
-                  className="flex flex-col items-center gap-1 shrink-0"
-                >
-                  <div className={`rounded-full p-0.5 transition-all ${selected ? 'ring-2 ring-primary-500 ring-offset-1' : ''}`}>
-                    <Avatar nome={m.nome} fotoUrl={m.fotoUrl} size="sm" />
-                  </div>
-                  <span className={`text-[10px] font-medium max-w-[48px] truncate ${selected ? 'text-primary-600' : 'text-slate-500'}`}>
-                    {isMe ? 'Eu' : displayName(m.nome, m.apelido)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {!viewingOwn && viewingMember && (
-            <p className="text-xs text-slate-400 text-center -mt-1">
-              Visualizando compromissos de <span className="font-medium text-slate-600">{displayName(viewingMember.nome, viewingMember.apelido)}</span>
-            </p>
-          )}
 
           <div className="flex items-center justify-between">
             <button
@@ -555,6 +527,35 @@ export function OracaoPage() {
       {/* ── Aba: Equipe Intercedida ── */}
       {aba === 'equipe' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
+
+          {/* Person picker */}
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+            {[...equipe].sort((a, b) => (a.id === user?.userId ? -1 : b.id === user?.userId ? 1 : 0)).map((m) => {
+              const isMe = m.id === user?.userId;
+              const selected = m.id === viewingUserId;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setViewingUserId(m.id)}
+                  className="flex flex-col items-center gap-1 shrink-0"
+                >
+                  <div className={`rounded-full p-0.5 transition-all ${selected ? 'ring-2 ring-primary-500 ring-offset-1' : ''}`}>
+                    <Avatar nome={m.nome} fotoUrl={m.fotoUrl} size="sm" />
+                  </div>
+                  <span className={`text-[10px] font-medium max-w-[48px] truncate ${selected ? 'text-primary-600' : 'text-slate-500'}`}>
+                    {isMe ? 'Eu' : displayName(m.nome, m.apelido)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {!viewingOwn && viewingMember && (
+            <p className="text-xs text-slate-400 text-center -mt-1">
+              Visualizando compromissos de <span className="font-medium text-slate-600">{displayName(viewingMember.nome, viewingMember.apelido)}</span>
+            </p>
+          )}
+
           {loadingEquipe && <PageSpinner />}
 
           {!loadingEquipe && semanas.map((sem) => {
