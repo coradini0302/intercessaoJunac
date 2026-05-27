@@ -85,7 +85,7 @@ function IdeiaCard({
   };
 
   const handleEditar = async () => {
-    if (!editTitulo.trim() || !editConteudo.trim()) return;
+    if (!editTitulo.trim() || !editConteudo.trim()) { toast.error('Preencha título e descrição.'); return; }
     try {
       await editarIdeia.mutateAsync({ id: ideia.id, titulo: editTitulo.trim(), conteudo: editConteudo.trim() });
       toast.success('Ideia atualizada!');
@@ -241,7 +241,7 @@ export function AltoMarPage() {
   const [saving, setSaving] = useState(false);
 
   const handleCriar = async () => {
-    if (!titulo.trim() || !conteudo.trim()) return;
+    if (!titulo.trim() || !conteudo.trim()) { toast.error('Preencha título e descrição.'); return; }
     setSaving(true);
     try {
       await criarIdeia.mutateAsync({ titulo: titulo.trim(), conteudo: conteudo.trim() });
