@@ -388,7 +388,7 @@ export function OracaoPage() {
   };
 
   const handleSalvar = async () => {
-    if (!form.titulo.trim()) return;
+    if (!form.titulo.trim()) { toast.error('Informe um título.'); return; }
     const dataHora = buildDataHora(form.data, form.horario, form.diaInteiro);
     setLoading(true);
     try {
