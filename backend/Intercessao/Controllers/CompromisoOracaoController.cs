@@ -31,8 +31,9 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
         return Ok(lista.Select(Mapear));
     }
 
+    private bool IsAdmin => User.IsInRole(Roles.DevAdmin) || User.IsInRole(Roles.Admin);
+
     [HttpPost]
-    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Criar([FromBody] CriarCompromisoIntercedidoRequest request)
     {
         var compromisso = new CompromisoIntercedido
@@ -54,7 +55,6 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarCompromisoIntercedidoRequest request)
     {
         var compromisso = await db.CompromissosIntercedidos
@@ -62,6 +62,7 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
+        if (compromisso.UsuarioId != UserId && !IsAdmin) return Forbid();
 
         compromisso.Titulo = request.Titulo;
         compromisso.Conteudo = request.Conteudo;
@@ -74,7 +75,6 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpPatch("{id:int}/arquivar")]
-    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Arquivar(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
@@ -82,6 +82,7 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
+        if (compromisso.UsuarioId != UserId && !IsAdmin) return Forbid();
 
         compromisso.Ativo = !compromisso.Ativo;
         compromisso.AtualizadoEm = DateTime.UtcNow;
@@ -91,13 +92,13 @@ public class CompromisoIntercedidoController(AppDbContext db) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = Roles.AdminOuSuperior)]
     public async Task<IActionResult> Excluir(int id)
     {
         var compromisso = await db.CompromissosIntercedidos
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (compromisso is null) return NotFound();
+        if (compromisso.UsuarioId != UserId && !IsAdmin) return Forbid();
 
         db.CompromissosIntercedidos.Remove(compromisso);
         await db.SaveChangesAsync();

@@ -464,8 +464,8 @@ export function OracaoPage() {
         ))}
       </div>
 
-      {/* ── Aba: Compromissos Intercessão ── */}
-      {aba === 'intercessao' && (
+      {/* ── Aba: Equipe Intercedida — commitments pessoais por membro ── */}
+      {aba === 'equipe' && (
         <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
 
           <div className="flex items-center justify-between">
@@ -479,54 +479,6 @@ export function OracaoPage() {
               {mostraArquivados ? 'Ocultar arquivados' : 'Ver arquivados'}
             </button>
           </div>
-
-          {loadingMeus && <PageSpinner />}
-
-          {!loadingMeus && semanas.map((sem) => {
-            const items = intercedidosPorSemana.get(sem) ?? [];
-            const open = openWeeks.has(sem);
-            const canAdd = !!admin && viewingOwn;
-            return (
-              <SemanaSection
-                key={sem} semana={sem} semanaAtual={semanaAtual}
-                open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, false)} canAdd={canAdd}
-              >
-                {items.length === 0 && (
-                  <div className="flex flex-col items-center gap-2 py-4">
-                    <BookOpen size={18} className="text-slate-300" />
-                    <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
-                    {canAdd && (
-                      <button onClick={() => openModalAdd(sem, false)} className="text-xs text-primary-600 hover:underline">
-                        + Adicionar
-                      </button>
-                    )}
-                  </div>
-                )}
-                {items.map((c) => (
-                  <EventoCard
-                    key={c.id}
-                    titulo={c.titulo}
-                    descricao={c.conteudo}
-                    dataHora={c.dataHora}
-                    diaInteiro={c.diaInteiro}
-                    passado={isEventoPast(c.dataHora, c.diaInteiro)}
-                    arquivado={!c.ativo}
-                    showActions={!!admin && viewingOwn}
-                    onEdit={admin && viewingOwn ? () => openModalEdit(c, false) : undefined}
-                    onArchivar={admin && viewingOwn ? () => handleArquivar(c.id, c.ativo) : undefined}
-                    onDelete={admin && viewingOwn ? () => handleDeletarMeus(c.id) : undefined}
-                  />
-                ))}
-              </SemanaSection>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── Aba: Equipe Intercedida ── */}
-      {aba === 'equipe' && (
-        <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
 
           {/* Person picker */}
           <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
@@ -556,24 +508,27 @@ export function OracaoPage() {
             </p>
           )}
 
-          {loadingEquipe && <PageSpinner />}
+          {loadingMeus && <PageSpinner />}
 
-          {!loadingEquipe && semanas.map((sem) => {
-            const items = equipePorSemana.get(sem) ?? [];
+          {!loadingMeus && semanas.map((sem) => {
+            const items = intercedidosPorSemana.get(sem) ?? [];
             const open = openWeeks.has(sem);
+            const canAdd = viewingOwn;
             return (
               <SemanaSection
                 key={sem} semana={sem} semanaAtual={semanaAtual}
                 open={open} onToggle={() => toggleWeek(sem)}
-                onAdd={() => openModalAdd(sem, true)} canAdd={true}
+                onAdd={() => openModalAdd(sem, false)} canAdd={canAdd}
               >
                 {items.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <BookOpen size={18} className="text-slate-300" />
                     <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
-                    <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
-                      + Adicionar
-                    </button>
+                    {canAdd && (
+                      <button onClick={() => openModalAdd(sem, false)} className="text-xs text-primary-600 hover:underline">
+                        + Adicionar
+                      </button>
+                    )}
                   </div>
                 )}
                 {items.map((c) => (
@@ -584,9 +539,57 @@ export function OracaoPage() {
                     dataHora={c.dataHora}
                     diaInteiro={c.diaInteiro}
                     passado={isEventoPast(c.dataHora, c.diaInteiro)}
-                    showActions={true}
-                    onEdit={() => openModalEdit(c, true)}
-                    onDelete={() => handleDeletarEquipe(c.id)}
+                    arquivado={!c.ativo}
+                    showActions={viewingOwn}
+                    onEdit={viewingOwn ? () => openModalEdit(c, false) : undefined}
+                    onArchivar={viewingOwn ? () => handleArquivar(c.id, c.ativo) : undefined}
+                    onDelete={viewingOwn ? () => handleDeletarMeus(c.id) : undefined}
+                  />
+                ))}
+              </SemanaSection>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Aba: Compromissos Intercessão — agenda compartilhada (admin) ── */}
+      {aba === 'intercessao' && (
+        <div className="px-4 py-4 flex flex-col gap-3 max-w-2xl w-full">
+
+          {loadingEquipe && <PageSpinner />}
+
+          {!loadingEquipe && semanas.map((sem) => {
+            const items = equipePorSemana.get(sem) ?? [];
+            const open = openWeeks.has(sem);
+            const canAdd = !!admin;
+            return (
+              <SemanaSection
+                key={sem} semana={sem} semanaAtual={semanaAtual}
+                open={open} onToggle={() => toggleWeek(sem)}
+                onAdd={() => openModalAdd(sem, true)} canAdd={canAdd}
+              >
+                {items.length === 0 && (
+                  <div className="flex flex-col items-center gap-2 py-4">
+                    <BookOpen size={18} className="text-slate-300" />
+                    <p className="text-xs text-slate-400">Nenhum compromisso nessa semana.</p>
+                    {canAdd && (
+                      <button onClick={() => openModalAdd(sem, true)} className="text-xs text-primary-600 hover:underline">
+                        + Adicionar
+                      </button>
+                    )}
+                  </div>
+                )}
+                {items.map((c) => (
+                  <EventoCard
+                    key={c.id}
+                    titulo={c.titulo}
+                    descricao={c.conteudo}
+                    dataHora={c.dataHora}
+                    diaInteiro={c.diaInteiro}
+                    passado={isEventoPast(c.dataHora, c.diaInteiro)}
+                    showActions={!!admin}
+                    onEdit={admin ? () => openModalEdit(c, true) : undefined}
+                    onDelete={admin ? () => handleDeletarEquipe(c.id) : undefined}
                   />
                 ))}
               </SemanaSection>
