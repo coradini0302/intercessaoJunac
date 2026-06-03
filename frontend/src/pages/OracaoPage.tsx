@@ -125,20 +125,20 @@ function EventoCard({
   onEdit?: () => void; onDelete?: () => void; onArchivar?: () => void; showActions: boolean;
 }) {
   return (
-    <div className={`bg-white rounded-xl border p-3.5 transition-opacity ${passado ? 'opacity-60' : ''} ${arquivado ? 'opacity-50' : ''} ${passado ? 'border-slate-100' : 'border-slate-100'}`}>
+    <div className={`bg-white rounded-xl border border-slate-100 p-3.5 ${arquivado ? 'opacity-50' : ''}`}>
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           {dataHora && (
             <div className="flex items-center gap-1.5 mb-1">
-              <Clock size={11} className={passado ? 'text-slate-300' : 'text-primary-400'} />
-              <span className={`text-[11px] font-medium ${passado ? 'text-slate-400' : 'text-primary-600'}`}>
+              <Clock size={11} className="text-primary-400" />
+              <span className="text-[11px] font-medium text-primary-600">
                 {formatEventDate(dataHora, diaInteiro)}
                 {diaInteiro && ' • Dia todo'}
               </span>
               {passado && <Badge label="Passado" variant="gray" />}
             </div>
           )}
-          <p className={`text-sm font-semibold leading-snug ${passado ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
+          <p className="text-sm font-semibold leading-snug text-slate-800">
             {titulo}
           </p>
           {descricao && (
