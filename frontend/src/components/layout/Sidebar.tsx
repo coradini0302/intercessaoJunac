@@ -48,7 +48,7 @@ export function Sidebar() {
           🕊️
         </div>
         <div>
-          <p className="font-bold text-slate-800 text-sm leading-tight">InterceJUNAC</p>
+          <p className="font-bold text-slate-800 text-sm leading-tight">Intercedeai</p>
           <p className="text-primary-500 text-xs font-medium">XXIX Encontro</p>
         </div>
       </div>

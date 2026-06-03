@@ -58,7 +58,7 @@ export function LoginPage() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm mb-4 shadow-lg">
               <span className="text-4xl">🕊️</span>
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">InterceJUNAC</h1>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Intercedeai</h1>
             <p className="text-white/80 text-sm mt-1 font-medium">XXIX Encontro</p>
           </div>
 
@@ -122,7 +122,7 @@ export function LoginPage() {
       </div>
 
       <div className="text-center pb-8">
-        <p className="text-white/50 text-xs">InterceJUNAC XXIX · 2026</p>
+        <p className="text-white/50 text-xs">Intercedeai XXIX · 2026</p>
       </div>
     </div>
   );
