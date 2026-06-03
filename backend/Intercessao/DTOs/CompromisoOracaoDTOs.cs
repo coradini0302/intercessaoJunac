@@ -5,7 +5,7 @@ namespace Intercessao.DTOs;
 public class CriarCompromisoIntercedidoRequest
 {
     [Required, MaxLength(200)] public string Titulo { get; set; } = string.Empty;
-    [MaxLength(1000)] public string? Conteudo { get; set; }
+    public string? Conteudo { get; set; }
     public DateTime? DataHora { get; set; }
     public bool DiaInteiro { get; set; } = true;
 }
@@ -13,7 +13,7 @@ public class CriarCompromisoIntercedidoRequest
 public class AtualizarCompromisoIntercedidoRequest
 {
     [Required, MaxLength(200)] public string Titulo { get; set; } = string.Empty;
-    [MaxLength(1000)] public string? Conteudo { get; set; }
+    public string? Conteudo { get; set; }
     public DateTime? DataHora { get; set; }
     public bool DiaInteiro { get; set; } = true;
 }

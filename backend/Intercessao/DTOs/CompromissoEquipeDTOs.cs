@@ -7,7 +7,7 @@ public class CriarCompromissoEquipeRequest
     public int EncontroId { get; set; }
     [Range(1, 16)] public int NumeroSemana { get; set; }
     [Required, MaxLength(200)] public string Titulo { get; set; } = string.Empty;
-    [MaxLength(1000)] public string? Conteudo { get; set; }
+    public string? Conteudo { get; set; }
     public DateTime? DataHora { get; set; }
     public bool DiaInteiro { get; set; } = true;
 }
@@ -15,7 +15,7 @@ public class CriarCompromissoEquipeRequest
 public class AtualizarCompromissoEquipeRequest
 {
     [Required, MaxLength(200)] public string Titulo { get; set; } = string.Empty;
-    [MaxLength(1000)] public string? Conteudo { get; set; }
+    public string? Conteudo { get; set; }
     public DateTime? DataHora { get; set; }
     public bool DiaInteiro { get; set; } = true;
 }
